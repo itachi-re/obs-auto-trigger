@@ -2,15 +2,14 @@ name: Check Upstream Versions & Trigger OBS
 
 on:
   schedule:
-    # Runs every 6 hours — adjust as needed (cron syntax: min hour day month weekday)
+    # Runs every 6 hours (cron syntax: min hour day month weekday)
     - cron: '0 */6 * * *'
   workflow_dispatch:
-    # Allows you to manually trigger this from the GitHub Actions UI
     inputs:
       dry_run:
-        description: 'Dry run (check versions only, do NOT trigger OBS)'
+        description: 'Dry run — check versions only, do NOT trigger OBS or commit'
         required: false
-        default: 'false'
+        default: false
         type: boolean
       force_package:
         description: 'Force-trigger a specific package name (leave empty to check all)'
@@ -18,8 +17,23 @@ on:
         default: ''
         type: string
 
+# ── Concurrency guard ────────────────────────────────────────────────────────
+# Prevents two scheduled runs from overlapping and racing on the git push.
+# cancel-in-progress: false lets the running job finish; new runs queue behind it.
+concurrency:
+  group: obs-check-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
-  contents: write   # needed to commit updated versions.json back to the repo
+  contents: write   # needed to commit versions.json back to the repo
+
+# ── Job-level env vars ───────────────────────────────────────────────────────
+# Defined once here; referenced via ${{ env.X }} below to avoid repetition.
+env:
+  OBS_PROJECT:    ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
+  VERSIONS_OLD:   versions.json
+  VERSIONS_NEW:   versions_new.json
+  PYTHON_VERSION: '3.12'
 
 jobs:
   check-and-trigger:
@@ -27,155 +41,284 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      # ── 1. Checkout the repo ─────────────────────────────────────────────
+      # ── 1. Checkout ──────────────────────────────────────────────────────
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v5
         with:
-          # fetch full history so we can push back the updated versions.json
           fetch-depth: 1
 
-      # ── 2. Set up Python ─────────────────────────────────────────────────
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v6
+      # ── 2. Python setup ──────────────────────────────────────────────────
+      # cache: 'pip' is omitted — it requires a requirements file to produce a
+      # stable cache key and is a no-op without one.
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      # ── 3. Install dependencies ───────────────────────────────────────────
-      - name: Install dependencies
+      # ── 3. Install dependencies ──────────────────────────────────────────
+      - name: Install Python dependencies
         run: |
           pip install --upgrade pip
           pip install 'nvchecker[all]' requests
 
-      # ── 4. Validate secrets are present ──────────────────────────────────
+      # ── 4. Validate required secrets ─────────────────────────────────────
+      # Secrets must be surfaced through env vars — embedding them directly in
+      # shell expressions (e.g. if [ -z "${{ secrets.X }}" ]) prints the value
+      # in the runner's expanded command log, defeating masking.
       - name: Validate required secrets
-        run: |
-          if [ -z "${{ secrets.OBS_TOKEN }}" ]; then
-            echo "❌ ERROR: OBS_TOKEN secret is not set."
-            echo "   See README.md for how to create an OBS token."
-            exit 1
-          fi
-          echo "✅ OBS_TOKEN is present"
-
-      # ── 5. Run nvchecker to detect new upstream versions ──────────────────
-      - name: Run nvchecker
         env:
-          # Provides read-only GitHub API access for rate limits
-          NVCHECKER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Optional: your own fine-grained PAT for higher GitHub API rate limits
-          # NVCHECKER_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+          _OBS_TOKEN: ${{ secrets.OBS_TOKEN }}
         run: |
-          echo "Running nvchecker against nvchecker.toml ..."
-          # --logger json emits structured output; errors go to stderr
+          set -euo pipefail
+          rc=0
+          if [ -z "${_OBS_TOKEN}" ]; then
+            echo "❌ ERROR: OBS_TOKEN secret is not set."
+            echo "   See README.md for instructions on creating an OBS token."
+            rc=1
+          fi
+          [ "$rc" -eq 0 ] && echo "✅ All required secrets are present."
+          exit "$rc"
+
+      # ── 5. Bootstrap versions.json on first run ───────────────────────────
+      # nvchecker needs an existing keyfile; create an empty one if absent.
+      - name: Bootstrap versions.json if missing
+        run: |
+          set -euo pipefail
+          if [ ! -f "${{ env.VERSIONS_OLD }}" ]; then
+            echo "{}" > "${{ env.VERSIONS_OLD }}"
+            echo "ℹ️  Created empty ${{ env.VERSIONS_OLD }} (first run)."
+          fi
+
+      # ── 6. Run nvchecker ──────────────────────────────────────────────────
+      # --keyfile  (-k) : known-good versions from the previous run (input)
+      # --save     (-l) : write newly detected versions here            (output)
+      # --logger json   : structured JSON lines on stdout for scripting
+      #
+      # nvchecker exits non-zero when updates are found, so we use || true
+      # and inspect the outputs ourselves rather than letting the shell abort.
+      #
+      # Token priority: prefer a fine-grained PAT (higher rate limits) and
+      # fall back to the built-in GITHUB_TOKEN if GITHUB_PAT is not set.
+      - name: Run nvchecker
+        id: nvchecker
+        env:
+          NVCHECKER_GITHUB_TOKEN: ${{ secrets.GITHUB_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "Running nvchecker against nvchecker.toml …"
+
           nvchecker \
             -c nvchecker.toml \
-            --logger json \
-            2>nvchecker_errors.log | tee nvchecker_output.jsonl || true
+            --keyfile "${{ env.VERSIONS_OLD }}" \
+            --save    "${{ env.VERSIONS_NEW }}" \
+            --logger  json \
+            2>nvchecker_errors.log | tee nvchecker_output.jsonl \
+            || true   # non-zero exit is normal when updates exist
 
-          # Show any errors so they surface in the workflow logs
+          # Surface warnings/errors in the workflow log
           if [ -s nvchecker_errors.log ]; then
             echo ""
             echo "⚠️  nvchecker warnings / errors:"
             cat nvchecker_errors.log
           fi
 
-      # ── 6. (Optional) Force-trigger a single package ──────────────────────
-      - name: Force-trigger specific package (if requested)
+          # Safety net: if nvchecker produced no output file, copy the old one
+          # so downstream steps always have a valid VERSIONS_NEW to work with.
+          if [ ! -f "${{ env.VERSIONS_NEW }}" ]; then
+            echo "ℹ️  No new versions file produced — copying old versions as baseline."
+            cp "${{ env.VERSIONS_OLD }}" "${{ env.VERSIONS_NEW }}"
+          fi
+
+      # ── 7. Show human-readable version diff ───────────────────────────────
+      - name: Show version diff
+        run: |
+          set -euo pipefail
+          echo "=== Version diff (old → new) ==="
+          python - <<'EOF'
+          import json, sys
+
+          def load(path):
+              try:
+                  with open(path) as f:
+                      return json.load(f)
+              except (FileNotFoundError, json.JSONDecodeError):
+                  return {}
+
+          old = load("${{ env.VERSIONS_OLD }}")
+          new = load("${{ env.VERSIONS_NEW }}")
+
+          changed = {k: (old.get(k, "(new)"), new[k]) for k in new if old.get(k) != new[k]}
+
+          if not changed:
+              print("  (no version changes detected)")
+              sys.exit(0)
+
+          col = max(len(k) for k in changed) + 2
+          for pkg, (prev, curr) in sorted(changed.items()):
+              print(f"  {pkg:<{col}} {prev}  →  {curr}")
+          EOF
+
+      # ── 8a. Force-trigger a single package (optional) ─────────────────────
+      - name: Force-trigger specific package
         if: ${{ github.event.inputs.force_package != '' }}
         env:
-          OBS_TOKEN: ${{ secrets.OBS_TOKEN }}
-          OBS_PROJECT: ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
+          OBS_TOKEN:     ${{ secrets.OBS_TOKEN }}
           FORCE_PACKAGE: ${{ github.event.inputs.force_package }}
+          DRY_RUN:       ${{ github.event.inputs.dry_run || 'false' }}
         run: |
-          python scripts/trigger_obs.py --force-package "$FORCE_PACKAGE"
+          set -euo pipefail
+          dry_flag=""
+          [ "$DRY_RUN" = "true" ] && dry_flag="--dry-run"
+          python scripts/trigger_obs.py \
+            --force-package "$FORCE_PACKAGE" \
+            $dry_flag
 
-      # ── 7. Diff versions and trigger OBS for updated packages ─────────────
+      # ── 8b. Trigger OBS for all updated packages ──────────────────────────
       - name: Trigger OBS service runs for updated packages
         if: ${{ github.event.inputs.force_package == '' }}
         env:
           OBS_TOKEN: ${{ secrets.OBS_TOKEN }}
-          OBS_PROJECT: ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          DRY_RUN:   ${{ github.event.inputs.dry_run || 'false' }}
         run: |
+          set -euo pipefail
+          dry_flag=""
+          [ "$DRY_RUN" = "true" ] && dry_flag="--dry-run"
           python scripts/trigger_obs.py \
-            --old-versions versions.json \
-            --new-versions versions_new.json \
-            --output-summary trigger_summary.json
+            --old-versions "${{ env.VERSIONS_OLD }}" \
+            --new-versions "${{ env.VERSIONS_NEW }}" \
+            --output-summary trigger_summary.json \
+            $dry_flag
 
-      # ── 8. Show a summary in the workflow log ─────────────────────────────
+      # ── 9. Print summary to log AND the Actions summary page ──────────────
       - name: Print trigger summary
         if: always()
         run: |
-          if [ -f trigger_summary.json ]; then
-            echo "=== Trigger Summary ==="
-            python -c "
-          import json, sys
-          with open('trigger_summary.json') as f:
-              s = json.load(f)
-          print(f\"Packages checked : {s.get('checked', 0)}\")
-          print(f\"Updates found    : {s.get('updated', 0)}\")
-          print(f\"OBS triggers sent: {s.get('triggered', 0)}\")
-          print(f\"Failures         : {s.get('failed', 0)}\")
-          if s.get('updated_list'):
-              print('')
-              print('Updated packages:')
-              for p in s['updated_list']:
-                  print(f\"  {p['package']}: {p['old']} -> {p['new']} [{p['status']}]\")
-          if s.get('failed_list'):
-              print('')
-              print('Failed packages:')
-              for p in s['failed_list']:
-                  print(f\"  {p['package']}: {p['error']}\")
-            "
+          set -euo pipefail
+          if [ ! -f trigger_summary.json ]; then
+            echo "No trigger_summary.json produced — skipping summary."
+            exit 0
           fi
 
-      # ── 9. Commit updated versions.json back to the repository ────────────
+          python - <<'EOF'
+          import json, os
+
+          with open("trigger_summary.json") as f:
+              s = json.load(f)
+
+          # ── Plain-text log output ──────────────────────────────────────
+          print("=== Trigger Summary ===")
+          print(f"  Packages checked  : {s.get('checked', 0)}")
+          print(f"  Updates found     : {s.get('updated', 0)}")
+          print(f"  OBS triggers sent : {s.get('triggered', 0)}")
+          print(f"  Failures          : {s.get('failed', 0)}")
+
+          if s.get("updated_list"):
+              print("\nUpdated packages:")
+              for p in s["updated_list"]:
+                  print(f"  {p['package']}: {p['old']} → {p['new']} [{p['status']}]")
+
+          if s.get("failed_list"):
+              print("\nFailed packages:")
+              for p in s["failed_list"]:
+                  print(f"  {p['package']}: {p['error']}")
+
+          # ── Markdown table for the GitHub Actions summary page ─────────
+          md = ["## OBS Trigger Summary\n"]
+          md += [
+              "| Metric | Value |",
+              "|--------|------:|",
+              f"| Packages checked  | {s.get('checked', 0)} |",
+              f"| Updates found     | {s.get('updated', 0)} |",
+              f"| OBS triggers sent | {s.get('triggered', 0)} |",
+              f"| Failures          | {s.get('failed', 0)} |",
+          ]
+
+          if s.get("updated_list"):
+              md += [
+                  "\n### Updated packages",
+                  "| Package | Old | New | Status |",
+                  "|---------|-----|-----|--------|",
+              ]
+              for p in s["updated_list"]:
+                  md.append(f"| `{p['package']}` | `{p['old']}` | `{p['new']}` | {p['status']} |")
+
+          if s.get("failed_list"):
+              md += [
+                  "\n### Failed packages",
+                  "| Package | Error |",
+                  "|---------|-------|",
+              ]
+              for p in s["failed_list"]:
+                  md.append(f"| `{p['package']}` | {p['error']} |")
+
+          ghs = os.environ.get("GITHUB_STEP_SUMMARY")
+          if ghs:
+              with open(ghs, "a") as f:
+                  f.write("\n".join(md) + "\n")
+          EOF
+
+      # ── 10. Commit updated versions.json ──────────────────────────────────
       - name: Commit updated versions.json
+        # Skip on dry runs; also guard against the scheduled path where
+        # github.event.inputs is null (the || 'false' coalesces to 'false').
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
-          if [ ! -f versions_new.json ]; then
+          set -euo pipefail
+
+          if [ ! -f "${{ env.VERSIONS_NEW }}" ]; then
             echo "No new versions file produced — nothing to commit."
             exit 0
           fi
 
-          # Merge new versions into versions.json
-          python -c "
+          # Merge new detections into versions.json, reporting what changed.
+          python - <<'EOF'
           import json
-          try:
-              with open('versions.json') as f:
-                  old = json.load(f)
-          except (FileNotFoundError, json.JSONDecodeError):
-              old = {}
-          with open('versions_new.json') as f:
-              new = json.load(f)
+
+          def load(path):
+              try:
+                  with open(path) as f:
+                      return json.load(f)
+              except (FileNotFoundError, json.JSONDecodeError):
+                  return {}
+
+          old    = load("versions.json")
+          new    = load("versions_new.json")
           merged = {**old, **new}
-          with open('versions.json', 'w') as f:
+
+          added   = len([k for k in new if k not in old])
+          changed = len([k for k in new if k in old and old[k] != new[k]])
+
+          with open("versions.json", "w") as f:
               json.dump(merged, f, indent=2, sort_keys=True)
-              f.write('\n')
-          print(f'Merged {len(new)} entries into versions.json')
-          "
+              f.write("\n")
+
+          print(f"Merged {len(new)} entries: {changed} updated, {added} newly tracked.")
+          EOF
 
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add versions.json
 
-          # Only commit if something changed
           if git diff --staged --quiet; then
             echo "versions.json is unchanged — skipping commit."
           else
+            # Rebase onto any commits that landed while this job was running
+            # (e.g. a manually triggered run overlapping with a scheduled one).
+            git pull --rebase --autostash origin HEAD
             git commit -m "chore: update known package versions [skip ci]"
             git push
             echo "✅ Pushed updated versions.json"
           fi
 
-      # ── 10. Upload logs as artifacts for debugging ───────────────────────
+      # ── 11. Upload debug artifacts ────────────────────────────────────────
       - name: Upload run artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v5
         with:
           name: nvchecker-run-${{ github.run_number }}
           path: |
             nvchecker_output.jsonl
             nvchecker_errors.log
             trigger_summary.json
+          if-no-files-found: ignore   # don't fail if a file was never created
           retention-days: 14
