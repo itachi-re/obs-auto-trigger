@@ -43,7 +43,7 @@ jobs:
     steps:
       # ── 1. Checkout ──────────────────────────────────────────────────────
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
@@ -90,12 +90,14 @@ jobs:
           fi
 
       # ── 6. Run nvchecker ──────────────────────────────────────────────────
-      # --keyfile  (-k) : known-good versions from the previous run (input)
-      # --save     (-l) : write newly detected versions here            (output)
-      # --logger json   : structured JSON lines on stdout for scripting
+      # File paths are declared in nvchecker.toml under [__config__]:
+      #   oldver = "versions.json"      ← input:  last-known versions
+      #   newver = "versions_new.json"  ← output: freshly detected versions
+      # Do NOT pass --keyfile / --save here — the toml owns those paths and
+      # the --save flag does not exist in current nvchecker releases.
       #
-      # nvchecker exits non-zero when updates are found, so we use || true
-      # and inspect the outputs ourselves rather than letting the shell abort.
+      # nvchecker exits non-zero when updates are found, so || true lets the
+      # pipeline continue; we inspect the outputs ourselves.
       #
       # Token priority: prefer a fine-grained PAT (higher rate limits) and
       # fall back to the built-in GITHUB_TOKEN if NVCHECKER_PAT is not set.
@@ -109,11 +111,9 @@ jobs:
 
           nvchecker \
             -c nvchecker.toml \
-            --keyfile "${{ env.VERSIONS_OLD }}" \
-            --save    "${{ env.VERSIONS_NEW }}" \
-            --logger  json \
+            --logger json \
             2>nvchecker_errors.log | tee nvchecker_output.jsonl \
-            || true    # allow pipeline to continue even if nvchecker exits non-zero
+            || true   # allow pipeline to continue even if nvchecker exits non-zero
 
           # Surface warnings/errors in the workflow log
           if [ -s nvchecker_errors.log ]; then
@@ -159,6 +159,8 @@ jobs:
           EOF
 
       # ── 8a. Force-trigger a single package (optional) ─────────────────────
+      # DRY_RUN is passed via env — trigger_obs.py reads os.environ["DRY_RUN"].
+      # Do NOT pass --dry-run as a CLI argument; the script does not accept it.
       - name: Force-trigger specific package
         if: ${{ github.event.inputs.force_package != '' }}
         env:
@@ -167,13 +169,11 @@ jobs:
           DRY_RUN:       ${{ github.event.inputs.dry_run || 'false' }}
         run: |
           set -euo pipefail
-          dry_flag=""
-          [ "$DRY_RUN" = "true" ] && dry_flag="--dry-run"
           python scripts/trigger_obs.py \
-            --force-package "$FORCE_PACKAGE" \
-            $dry_flag
+            --force-package "$FORCE_PACKAGE"
 
       # ── 8b. Trigger OBS for all updated packages ──────────────────────────
+      # DRY_RUN is passed via env — trigger_obs.py reads os.environ["DRY_RUN"].
       - name: Trigger OBS service runs for updated packages
         if: ${{ github.event.inputs.force_package == '' }}
         env:
@@ -181,13 +181,10 @@ jobs:
           DRY_RUN:   ${{ github.event.inputs.dry_run || 'false' }}
         run: |
           set -euo pipefail
-          dry_flag=""
-          [ "$DRY_RUN" = "true" ] && dry_flag="--dry-run"
           python scripts/trigger_obs.py \
             --old-versions "${{ env.VERSIONS_OLD }}" \
             --new-versions "${{ env.VERSIONS_NEW }}" \
-            --output-summary trigger_summary.json \
-            $dry_flag
+            --output-summary trigger_summary.json
 
       # ── 9. Print summary to log AND the Actions summary page ──────────────
       - name: Print trigger summary
@@ -266,7 +263,7 @@ jobs:
           set -euo pipefail
 
           # Prevent committing bad state if triggers failed
-            if [ -f trigger_summary.json ] && grep -q '"failed": [1-9]' trigger_summary.json; then
+          if [ -f trigger_summary.json ] && grep -q '"failed": [1-9]' trigger_summary.json; then
             echo "❌ Some OBS triggers failed — skipping commit to avoid bad state"
             exit 1
           fi
