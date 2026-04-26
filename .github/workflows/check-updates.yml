@@ -52,7 +52,7 @@ jobs:
       # cache: 'pip' is omitted — it requires a requirements file to produce a
       # stable cache key and is a no-op without one.
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -355,7 +355,7 @@ jobs:
       # ── 11. Upload debug artifacts ────────────────────────────────────────
       - name: Upload run artifacts
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: nvchecker-run-${{ github.run_number }}
           path: |
