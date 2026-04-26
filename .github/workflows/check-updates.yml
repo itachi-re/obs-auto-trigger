@@ -98,11 +98,11 @@ jobs:
       # and inspect the outputs ourselves rather than letting the shell abort.
       #
       # Token priority: prefer a fine-grained PAT (higher rate limits) and
-      # fall back to the built-in GITHUB_TOKEN if GITHUB_PAT is not set.
+      # fall back to the built-in GITHUB_TOKEN if NVCHECKER_PAT is not set.
       - name: Run nvchecker
         id: nvchecker
         env:
-          NVCHECKER_GITHUB_TOKEN: ${{ secrets.GITHUB_PAT || secrets.GITHUB_TOKEN }}
+          NVCHECKER_GITHUB_TOKEN: ${{ secrets.NVCHECKER_PAT || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           echo "Running nvchecker against nvchecker.toml …"
@@ -113,7 +113,7 @@ jobs:
             --save    "${{ env.VERSIONS_NEW }}" \
             --logger  json \
             2>nvchecker_errors.log | tee nvchecker_output.jsonl \
-            || true   # non-zero exit is normal when updates exist
+            || true    # allow pipeline to continue even if nvchecker exits non-zero
 
           # Surface warnings/errors in the workflow log
           if [ -s nvchecker_errors.log ]; then
@@ -265,9 +265,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ ! -f "${{ env.VERSIONS_NEW }}" ]; then
-            echo "No new versions file produced — nothing to commit."
-            exit 0
+          # Prevent committing bad state if triggers failed
+            if [ -f trigger_summary.json ] && grep -q '"failed": [1-9]' trigger_summary.json; then
+            echo "❌ Some OBS triggers failed — skipping commit to avoid bad state"
+            exit 1
           fi
 
           # Merge new detections into versions.json, reporting what changed.
