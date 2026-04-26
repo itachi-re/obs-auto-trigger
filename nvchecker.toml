@@ -33,7 +33,16 @@ source = "github"
 github = "iBotPeaches/Apktool"
 use_max_tag = true
 
-# android-build-tools: internal build artifact — no upstream to track. REMOVED.
+[android-build-tools]
+source = "android_sdk"
+android_sdk = "build-tools"
+repo = "package"
+channel = "stable"
+
+[android-platform-tools]
+source = "android_sdk"
+android_sdk = "platform-tools"
+repo = "package"
 
 [android-studio]
 source = "github"
@@ -115,11 +124,6 @@ source = "github"
 github = "lhvy/pipes-rs"
 use_max_tag = true
 
-[pipes.sh]
-source = "github"
-github = "pipeseroni/pipes.sh"
-use_latest_release = true
-
 [tree]
 # classic Unix tree command — tracked via Anitya (release-monitoring.org)
 source = "anitya"
@@ -189,7 +193,7 @@ use_max_tag = true
 
 [brave-browser]
 source = "github"
-github = "itachi-re/brave-browser-obs"
+github = "brave/brave-browser"
 use_max_tag = true
 
 [ff-dev-edition]
@@ -202,12 +206,16 @@ use_max_tag = true
 # ══════════════════════════════════════════════════════════════════════════════
 
 [cloudflare-warp]
-# Official Cloudflare WARP Linux client
 source = "github"
 github = "cloudflare/cloudflared"
 use_latest_release = true
 
 # cloudflare_warp (underscore): duplicate of cloudflare-warp. REMOVED.
+[cloudflare_warp]
+# Official Cloudflare WARP Linux client
+source = "github"
+github = "cloudflare/cloudflared"
+use_latest_release = true
 
 [wgcf]
 source = "github"
@@ -540,15 +548,15 @@ use_max_tag = true
 # ══════════════════════════════════════════════════════════════════════════════
 
 [zoom]
-# Zoom has no public git repo — scrape the RPM redirect URL for the version
 source = "cmd"
-cmd = "curl -sI 'https://zoom.us/client/latest/zoom_x86_64.rpm' | grep -oP 'zoom_\\K[0-9._]+(?=_x86_64)' | tr '_' '.'"
+cmd = "curl -fsSL 'https://zoom.us/rest/download?os=linux' | jq -r '.result.version'"
+include_pattern = "^[0-9.]+$"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Download managers
 # ══════════════════════════════════════════════════════════════════════════════
 
 [jdownloader2]
-# JDownloader has no public git/release API — scrape their download page
 source = "cmd"
-cmd = "curl -s https://jdownloader.org/jdownloader2 | grep -oP '(?<=Version )[0-9.]+' | head -1"
+cmd = "curl -fsSI 'https://jdownloader.org/download/jdownloader2?os=windows' | grep -oP 'JDownloader2Setup_\\K[0-9.]+(?=\\.exe)'"
+include_pattern = "^[0-9.]+$"
