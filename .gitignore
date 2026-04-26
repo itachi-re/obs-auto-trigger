@@ -1,0 +1,13 @@
+# nvchecker output — only versions.json is committed
+versions_new.json
+nvchecker_output.jsonl
+nvchecker_errors.log
+trigger_summary.json
+
+# Local keyfile with API tokens — NEVER commit this
+.nvchecker_keyfile.toml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
