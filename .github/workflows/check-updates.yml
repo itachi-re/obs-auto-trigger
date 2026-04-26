@@ -29,16 +29,16 @@ jobs:
     steps:
       # ── 1. Checkout the repo ─────────────────────────────────────────────
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # fetch full history so we can push back the updated versions.json
           fetch-depth: 1
 
       # ── 2. Set up Python ─────────────────────────────────────────────────
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
           cache: 'pip'
 
       # ── 3. Install dependencies ───────────────────────────────────────────
@@ -171,7 +171,7 @@ jobs:
       # ── 10. Upload logs as artifacts for debugging ───────────────────────
       - name: Upload run artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: nvchecker-run-${{ github.run_number }}
           path: |
