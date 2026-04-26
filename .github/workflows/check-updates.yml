@@ -30,6 +30,7 @@ permissions:
 # ── Job-level env vars ───────────────────────────────────────────────────────
 # Defined once here; referenced via ${{ env.X }} below to avoid repetition.
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   OBS_PROJECT:    ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
   VERSIONS_OLD:   versions.json
   VERSIONS_NEW:   versions_new.json
