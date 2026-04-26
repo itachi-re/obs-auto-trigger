@@ -1,323 +1,554 @@
-# nvchecker.toml — upstream version checker for home:itachi_re
-#
-# This file tells nvchecker WHERE to find the latest upstream version
-# of each of your OBS packages. nvchecker supports:
-#   GitHub releases/tags, KDE invent.kde.org (GitLab), PyPI, AUR,
-#   generic git tags, HTML scraping, custom shell commands, and more.
+# nvchecker.toml — upstream version checker config for home:itachi_re
 #
 # Docs: https://nvchecker.readthedocs.io/en/latest/usage.html
-#
-# ── How nvchecker uses this file ─────────────────────────────────────────────
-# 1. Reads KNOWN versions from   versions.json     (committed to git)
-# 2. Checks UPSTREAM versions,   writes to         versions_new.json
-# 3. trigger_obs.py diffs old vs new, fires OBS API for changed packages
-# 4. GitHub Actions commits updated versions.json back to the repo
-# ─────────────────────────────────────────────────────────────────────────────
 
 [__config__]
 oldver = "versions.json"
 newver = "versions_new.json"
 
-# ── Optional: keyfile for tokens (create .nvchecker_keyfile.toml, git-ignored)
+# Optional: GitHub token for higher API rate limits
 # keyfile = ".nvchecker_keyfile.toml"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# KDE Plasma Workspace core
+# Microsoft / DirectX
 # ══════════════════════════════════════════════════════════════════════════════
 
-[plasma-desktop]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-desktop"
-use_max_tag = true
-
-[plasma-workspace]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-workspace"
-use_max_tag = true
-
-[kwin]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/kwin"
-use_max_tag = true
-
-[plasma-wayland-protocols]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-wayland-protocols"
-use_max_tag = true
-
-[kwayland]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/kwayland"
-use_max_tag = true
-
-[layer-shell-qt]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/layer-shell-qt"
-use_max_tag = true
-
-[plasma-activities]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-activities"
-use_max_tag = true
-
-[plasma-activities-stats]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-activities-stats"
-use_max_tag = true
-
-[plasma-browser-integration]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-browser-integration"
-use_max_tag = true
-
-[plasma-disks]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-disks"
-use_max_tag = true
-
-[plasma-firewall]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-firewall"
-use_max_tag = true
-
-[plasma-integration]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-integration"
-use_max_tag = true
-
-[plasma-nm]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-nm"
-use_max_tag = true
-
-[plasma-pa]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-pa"
-use_max_tag = true
-
-[plasma-systemmonitor]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-systemmonitor"
-use_max_tag = true
-
-[plasma-thunderbolt]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-thunderbolt"
-use_max_tag = true
-
-[plasma-vault]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-vault"
-use_max_tag = true
-
-[plasma-welcome]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/plasma-welcome"
-use_max_tag = true
-
-[drkonqi]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/drkonqi"
-use_max_tag = true
-
-[kde-gtk-config]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/kde-gtk-config"
-use_max_tag = true
-
-[kdeplasma-addons]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/kdeplasma-addons"
-use_max_tag = true
-
-[kscreenlocker]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/kscreenlocker"
-use_max_tag = true
-
-[ksshaskpass]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/ksshaskpass"
-use_max_tag = true
-
-[ksystemstats]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/ksystemstats"
-use_max_tag = true
-
-[kwallet-pam]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/kwallet-pam"
-use_max_tag = true
-
-[kwrited]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/kwrited"
-use_max_tag = true
-
-[milou]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/milou"
-use_max_tag = true
-
-[oxygen]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/oxygen"
-use_max_tag = true
-
-[oxygen-sounds]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/oxygen-sounds"
-use_max_tag = true
-
-[polkit-kde-agent-1]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/polkit-kde-agent-1"
-use_max_tag = true
-
-[powerdevil]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/powerdevil"
-use_max_tag = true
-
-[sddm-kcm]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/sddm-kcm"
-use_max_tag = true
-
-[systemsettings]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/systemsettings"
-use_max_tag = true
-
-[xdg-desktop-portal-kde]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "plasma/xdg-desktop-portal-kde"
-use_max_tag = true
-
-# ══════════════════════════════════════════════════════════════════════════════
-# KDE Frameworks (KF6) — examples, add yours
-# ══════════════════════════════════════════════════════════════════════════════
-
-[extra-cmake-modules]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "frameworks/extra-cmake-modules"
-use_max_tag = true
-
-[kconfig]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "frameworks/kconfig"
-use_max_tag = true
-
-[kcoreaddons]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "frameworks/kcoreaddons"
-use_max_tag = true
-
-[ki18n]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "frameworks/ki18n"
-use_max_tag = true
-
-[kwindowsystem]
-source = "gitlab"
-host = "https://invent.kde.org"
-gitlab = "frameworks/kwindowsystem"
-use_max_tag = true
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Wayland protocol libraries (freedesktop)
-# ══════════════════════════════════════════════════════════════════════════════
-
-[wayland]
-source = "gitlab"
-host = "https://gitlab.freedesktop.org"
-gitlab = "wayland/wayland"
-use_max_tag = true
-
-[wayland-protocols]
-source = "gitlab"
-host = "https://gitlab.freedesktop.org"
-gitlab = "wayland/wayland-protocols"
-use_max_tag = true
-
-[libxkbcommon]
+[DirectXShaderCompiler]
 source = "github"
-github = "xkbcommon/libxkbcommon"
+github = "microsoft/DirectXShaderCompiler"
 use_max_tag = true
-prefix = "xkbcommon-"
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Apps / tools (GitHub examples)
+# Android / Waydroid ecosystem
 # ══════════════════════════════════════════════════════════════════════════════
 
-# [some-github-app]
-# source = "github"
-# github = "owner/repo"
-# use_latest_release = true   # use this for packages with proper GitHub Releases
-# # use_max_tag = true         # use this for repos that only push git tags
+[anbox-modules]
+source = "github"
+github = "llyyr/anbox-modules"
+use_max_tag = true
+
+[android-apktool]
+source = "github"
+github = "iBotPeaches/Apktool"
+use_max_tag = true
+
+# android-build-tools: internal build artifact — no upstream to track. REMOVED.
+
+[android-studio]
+source = "github"
+github = "itachi-re/android-studio-obs"
+use_max_tag = true
+
+[libgbinder]
+source = "github"
+github = "mer-hybris/libgbinder"
+use_max_tag = true
+
+[libglibutil]
+source = "github"
+github = "sailfishos/libglibutil"
+use_max_tag = true
+
+[python-gbinder]
+source = "github"
+github = "waydroid/gbinder-python"
+use_max_tag = true
+
+[waydroid]
+source = "github"
+github = "waydroid/waydroid"
+use_max_tag = true
+
+[waydroid-image]
+source = "github"
+github = "itachi-re/waydroid-image-obs"
+use_max_tag = true
+
+# waydroid-image-gapps / waydroid-image-vanilla: build outputs, not upstream
+# projects — tracking them makes no sense. REMOVED.
+
+[waydroid-kmp-default]
+source = "github"
+github = "llyyr/anbox-modules"
+use_max_tag = true
+
+[waydroid-magisk]
+source = "github"
+github = "nitanmarcel/waydroid-magisk"
+use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PyPI packages (if any)
+# Arduino / Embedded
 # ══════════════════════════════════════════════════════════════════════════════
 
-# [python-example]
-# source = "pypi"
-# pypi = "example-package"
+[arduino-ide]
+source = "github"
+github = "arduino/arduino-ide"
+use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
-# AUR packages (if any — useful to cross-check versions)
+# Arch Linux tools
 # ══════════════════════════════════════════════════════════════════════════════
 
-# [some-aur-package]
-# source = "aur"
-# aur = "package-name-in-aur"
+[arch-install-scripts]
+source = "github"
+github = "archlinux/arch-install-scripts"
+use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Generic HTTP / regex (last resort)
+# Fun / Terminal toys
 # ══════════════════════════════════════════════════════════════════════════════
 
-# [some-package-with-custom-page]
-# source = "regex"
-# url = "https://example.com/downloads/"
-# regex = 'some-package-(\d[\d.]+)\.tar'
-# use_max_version = true
+[asciiquarium]
+source = "github"
+github = "itachi-re/asciiquarium"
+use_max_tag = true
+
+[perl-Term-Animation]
+# Term::Animation is the Perl module asciiquarium depends on
+source = "cpan"
+cpan = "Term-Animation"
+
+[pipes-rs]
+source = "github"
+github = "lhvy/pipes-rs"
+use_max_tag = true
+
+[pipes.sh]
+source = "github"
+github = "pipeseroni/pipes.sh"
+use_latest_release = true
+
+[tree]
+# classic Unix tree command — tracked via Anitya (release-monitoring.org)
+source = "anitya"
+anitya = "fedora/tree"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Audio / Media
+# ══════════════════════════════════════════════════════════════════════════════
+
+[audio-share]
+source = "github"
+github = "mkckr0/audio-share"
+use_max_tag = true
+
+[hypnotix]
+source = "github"
+github = "linuxmint/hypnotix"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Email
+# ══════════════════════════════════════════════════════════════════════════════
+
+[betterbird]
+# Betterbird releases are tagged on their own GitHub repo
+source = "github"
+github = "Betterbird/thunderbird-patches"
+use_latest_release = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# System utilities
+# ══════════════════════════════════════════════════════════════════════════════
+
+[bleachbit]
+source = "github"
+github = "bleachbit/bleachbit"
+use_max_tag = true
+
+[fastfetch]
+source = "github"
+github = "fastfetch-cli/fastfetch"
+use_max_tag = true
+
+[iotop]
+source = "github"
+github = "Tomas-M/iotop"
+use_max_tag = true
+
+[input-remapper]
+source = "github"
+github = "sezanzeb/input-remapper"
+use_latest_release = true
+
+[zypperoni]
+source = "github"
+github = "pavinjosdev/zypperoni"
+use_max_tag = true
+
+[zypperx]
+source = "github"
+github = "itachi-re/zypperx"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Browsers
+# ══════════════════════════════════════════════════════════════════════════════
+
+[brave-browser]
+source = "github"
+github = "itachi-re/brave-browser-obs"
+use_max_tag = true
+
+[ff-dev-edition]
+source = "github"
+github = "itachi-re/ff-dev-obs"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Network / VPN
+# ══════════════════════════════════════════════════════════════════════════════
+
+[cloudflare-warp]
+# Official Cloudflare WARP Linux client
+source = "github"
+github = "cloudflare/cloudflared"
+use_latest_release = true
+
+# cloudflare_warp (underscore): duplicate of cloudflare-warp. REMOVED.
+
+[wgcf]
+source = "github"
+github = "ViRb3/wgcf"
+use_max_tag = true
+
+[wg-info]
+source = "git"
+git = "https://codeberg.org/itachi-re/wg-info.git"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Development tools
+# ══════════════════════════════════════════════════════════════════════════════
+
+[codium]
+source = "github"
+github = "VSCodium/vscodium"
+use_max_tag = true
+
+[gradle]
+# The _service was pointing at the GitHub releases API — use GitHub directly
+source = "github"
+github = "gradle/gradle"
+use_latest_release = true
+
+[codeblocks]
+# Code::Blocks — tracked via Anitya (Sourceforge upstream)
+source = "anitya"
+anitya = "fedora/codeblocks"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Fonts
+# ══════════════════════════════════════════════════════════════════════════════
+
+[monaspace-fonts]
+source = "github"
+github = "githubnext/monaspace"
+use_max_tag = true
+
+[nerd-fonts]
+source = "github"
+github = "ryanoasis/nerd-fonts"
+use_max_tag = true
+
+[circle-flags]
+source = "github"
+github = "linuxmint/circle-flags"
+use_max_tag = true
+
+[iso-country-flags]
+source = "github"
+github = "linuxmint/flags"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Gaming / Wine / Emulation
+# ══════════════════════════════════════════════════════════════════════════════
+
+[faugus-launcher]
+source = "github"
+github = "Faugus/faugus-launcher"
+use_max_tag = true
+
+[protonup-qt]
+source = "github"
+github = "DavidoTek/ProtonUp-Qt"
+use_max_tag = true
+
+[rbdoom3bfg]
+source = "github"
+github = "RobertBeckebans/RBDOOM-3-BFG"
+use_max_tag = true
+
+[windows95]
+source = "github"
+github = "felixrieseberg/windows95"
+use_max_tag = true
+
+[winboat]
+source = "github"
+github = "TibixDev/winboat"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Manga / Comics
+# ══════════════════════════════════════════════════════════════════════════════
+
+[mangayomi]
+source = "github"
+github = "kodjodevf/mangayomi"
+use_max_tag = true
+
+[komikku]
+source = "git"
+git = "https://codeberg.org/valos/Komikku.git"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# KDE / Plasma extras
+# ══════════════════════════════════════════════════════════════════════════════
+
+[kde-material-you-colors]
+source = "github"
+github = "luisbocanegra/kde-material-you-colors"
+use_max_tag = true
+
+[kurve]
+source = "github"
+github = "luisbocanegra/kurve"
+use_max_tag = true
+
+[plasma-panel-colorizer]
+source = "github"
+github = "luisbocanegra/plasma-panel-colorizer"
+use_max_tag = true
+
+[plasma-panel-spacer-extended]
+source = "github"
+github = "luisbocanegra/plasma-panel-spacer-extended"
+use_max_tag = true
+
+[plasma-smart-video-wallpaper-reborn]
+source = "github"
+github = "luisbocanegra/plasma-smart-video-wallpaper-reborn"
+use_max_tag = true
+
+[plasma-wallpaper-effects]
+source = "github"
+github = "luisbocanegra/plasma-wallpaper-effects"
+use_max_tag = true
+
+[plasma6-ksplash-bgrt]
+source = "github"
+github = "kbroulik/ksplash-bgrt"
+use_max_tag = true
+
+[plasma6-theme-apus]
+source = "git"
+git = "https://gitlab.com/jomada/apus.git"
+use_max_tag = true
+
+[plasma6-theme-klassy]
+source = "github"
+github = "paulmcauley/klassy"
+use_max_tag = true
+
+[plasma6-theme-otto]
+source = "git"
+git = "https://gitlab.com/jomada/otto.git"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# KDE Applications
+# ══════════════════════════════════════════════════════════════════════════════
+
+[krita]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "graphics/krita"
+use_max_tag = true
+
+[kseexpr]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "graphics/kseexpr"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Kernel
+# ══════════════════════════════════════════════════════════════════════════════
+
+[kernel-xanmod-v3]
+source = "git"
+git = "https://gitlab.com/xanmod/linux.git"
+use_max_tag = true
+# Xanmod tags look like "6.9.3-xanmod1" — add include_pattern if needed:
+# include_pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+-xanmod[0-9]+$"
+
+[xanmod-edge-custom]
+source = "git"
+git = "https://gitlab.com/xanmod/linux.git"
+use_max_tag = true
+
+# kernel-copyto: custom/local kernel module — no public upstream. Skip.
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Lua / Perl / Python packages
+# ══════════════════════════════════════════════════════════════════════════════
+
+[lua51-lpeg]
+# LPeg moved to GitHub under lunarmodules org
+source = "github"
+github = "lunarmodules/lpeg"
+use_max_tag = true
+
+[python-pyclip]
+source = "github"
+github = "spyoungtech/pyclip"
+use_max_tag = true
+
+[python3-materialyoucolor]
+source = "github"
+github = "T-Dynamos/materialyoucolor-python"
+use_max_tag = true
+
+[python3-pywal16]
+source = "github"
+github = "eylles/pywal16"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Qt / Multimedia
+# ══════════════════════════════════════════════════════════════════════════════
+
+[qt6-multimedia-ffmpeg]
+source = "github"
+github = "qt/qtmultimedia"
+use_max_tag = true
+
+[qtscrcpy]
+source = "github"
+github = "barry-ran/QtScrcpyCore"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Torrents
+# ══════════════════════════════════════════════════════════════════════════════
+
+[qBittorrent-Enhanced-Edition]
+source = "github"
+github = "c0re100/qBittorrent-Enhanced-Edition"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Boot / EFI
+# ══════════════════════════════════════════════════════════════════════════════
+
+[rEFInd]
+source = "git"
+git = "https://gitlab.com/btklein/refind.git"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Remote desktop / Screen sharing
+# ══════════════════════════════════════════════════════════════════════════════
+
+[droidcam]
+source = "github"
+github = "dev47apps/droidcam-linux-client"
+use_max_tag = true
+
+[rustdesk]
+source = "github"
+github = "rustdesk/rustdesk"
+use_max_tag = true
+
+[scrcpy]
+source = "github"
+github = "Genymobile/scrcpy"
+use_latest_release = true
+
+[scrcpy-autoadb]
+source = "github"
+github = "nickcoutsos/scrcpy-autoadb"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Messaging / Social
+# ══════════════════════════════════════════════════════════════════════════════
+
+[telegram]
+source = "github"
+github = "telegramdesktop/tdesktop"
+use_max_tag = true
+
+[webcord]
+source = "github"
+github = "SpacingBat3/WebCord"
+use_max_tag = true
+
+[win11-clipboard-history]
+source = "github"
+github = "gustavosett/Windows-11-Clipboard-History-For-Linux"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Storage / ISO tools
+# ══════════════════════════════════════════════════════════════════════════════
+
+[ventoy]
+source = "github"
+github = "ventoy/Ventoy"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# AppImage management
+# ══════════════════════════════════════════════════════════════════════════════
+
+[gearlever]
+source = "github"
+github = "mijorus/gearlever"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# RGB / Hardware
+# ══════════════════════════════════════════════════════════════════════════════
+
+[openrgb]
+source = "git"
+git = "https://gitlab.com/CalcProgrammer1/OpenRGB.git"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Shell plugins
+# ══════════════════════════════════════════════════════════════════════════════
+
+[zsh-autosuggestions]
+source = "github"
+github = "zsh-users/zsh-autosuggestions"
+use_max_tag = true
+
+[zsh-syntax-highlighting]
+source = "github"
+github = "zsh-users/zsh-syntax-highlighting"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Video calls
+# ══════════════════════════════════════════════════════════════════════════════
+
+[zoom]
+# Zoom has no public git repo — scrape the RPM redirect URL for the version
+source = "cmd"
+cmd = "curl -sI 'https://zoom.us/client/latest/zoom_x86_64.rpm' | grep -oP 'zoom_\\K[0-9._]+(?=_x86_64)' | tr '_' '.'"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Download managers
+# ══════════════════════════════════════════════════════════════════════════════
+
+[jdownloader2]
+# JDownloader has no public git/release API — scrape their download page
+source = "cmd"
+cmd = "curl -s https://jdownloader.org/jdownloader2 | grep -oP '(?<=Version )[0-9.]+' | head -1"

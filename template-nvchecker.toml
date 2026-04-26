@@ -1,0 +1,323 @@
+# nvchecker.toml — upstream version checker for home:itachi_re
+#
+# This file tells nvchecker WHERE to find the latest upstream version
+# of each of your OBS packages. nvchecker supports:
+#   GitHub releases/tags, KDE invent.kde.org (GitLab), PyPI, AUR,
+#   generic git tags, HTML scraping, custom shell commands, and more.
+#
+# Docs: https://nvchecker.readthedocs.io/en/latest/usage.html
+#
+# ── How nvchecker uses this file ─────────────────────────────────────────────
+# 1. Reads KNOWN versions from   versions.json     (committed to git)
+# 2. Checks UPSTREAM versions,   writes to         versions_new.json
+# 3. trigger_obs.py diffs old vs new, fires OBS API for changed packages
+# 4. GitHub Actions commits updated versions.json back to the repo
+# ─────────────────────────────────────────────────────────────────────────────
+
+[__config__]
+oldver = "versions.json"
+newver = "versions_new.json"
+
+# ── Optional: keyfile for tokens (create .nvchecker_keyfile.toml, git-ignored)
+# keyfile = ".nvchecker_keyfile.toml"
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# KDE Plasma Workspace core
+# ══════════════════════════════════════════════════════════════════════════════
+
+[plasma-desktop]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-desktop"
+use_max_tag = true
+
+[plasma-workspace]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-workspace"
+use_max_tag = true
+
+[kwin]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/kwin"
+use_max_tag = true
+
+[plasma-wayland-protocols]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-wayland-protocols"
+use_max_tag = true
+
+[kwayland]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/kwayland"
+use_max_tag = true
+
+[layer-shell-qt]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/layer-shell-qt"
+use_max_tag = true
+
+[plasma-activities]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-activities"
+use_max_tag = true
+
+[plasma-activities-stats]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-activities-stats"
+use_max_tag = true
+
+[plasma-browser-integration]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-browser-integration"
+use_max_tag = true
+
+[plasma-disks]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-disks"
+use_max_tag = true
+
+[plasma-firewall]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-firewall"
+use_max_tag = true
+
+[plasma-integration]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-integration"
+use_max_tag = true
+
+[plasma-nm]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-nm"
+use_max_tag = true
+
+[plasma-pa]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-pa"
+use_max_tag = true
+
+[plasma-systemmonitor]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-systemmonitor"
+use_max_tag = true
+
+[plasma-thunderbolt]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-thunderbolt"
+use_max_tag = true
+
+[plasma-vault]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-vault"
+use_max_tag = true
+
+[plasma-welcome]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/plasma-welcome"
+use_max_tag = true
+
+[drkonqi]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/drkonqi"
+use_max_tag = true
+
+[kde-gtk-config]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/kde-gtk-config"
+use_max_tag = true
+
+[kdeplasma-addons]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/kdeplasma-addons"
+use_max_tag = true
+
+[kscreenlocker]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/kscreenlocker"
+use_max_tag = true
+
+[ksshaskpass]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/ksshaskpass"
+use_max_tag = true
+
+[ksystemstats]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/ksystemstats"
+use_max_tag = true
+
+[kwallet-pam]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/kwallet-pam"
+use_max_tag = true
+
+[kwrited]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/kwrited"
+use_max_tag = true
+
+[milou]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/milou"
+use_max_tag = true
+
+[oxygen]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/oxygen"
+use_max_tag = true
+
+[oxygen-sounds]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/oxygen-sounds"
+use_max_tag = true
+
+[polkit-kde-agent-1]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/polkit-kde-agent-1"
+use_max_tag = true
+
+[powerdevil]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/powerdevil"
+use_max_tag = true
+
+[sddm-kcm]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/sddm-kcm"
+use_max_tag = true
+
+[systemsettings]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/systemsettings"
+use_max_tag = true
+
+[xdg-desktop-portal-kde]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "plasma/xdg-desktop-portal-kde"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# KDE Frameworks (KF6) — examples, add yours
+# ══════════════════════════════════════════════════════════════════════════════
+
+[extra-cmake-modules]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "frameworks/extra-cmake-modules"
+use_max_tag = true
+
+[kconfig]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "frameworks/kconfig"
+use_max_tag = true
+
+[kcoreaddons]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "frameworks/kcoreaddons"
+use_max_tag = true
+
+[ki18n]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "frameworks/ki18n"
+use_max_tag = true
+
+[kwindowsystem]
+source = "gitlab"
+host = "https://invent.kde.org"
+gitlab = "frameworks/kwindowsystem"
+use_max_tag = true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Wayland protocol libraries (freedesktop)
+# ══════════════════════════════════════════════════════════════════════════════
+
+[wayland]
+source = "gitlab"
+host = "https://gitlab.freedesktop.org"
+gitlab = "wayland/wayland"
+use_max_tag = true
+
+[wayland-protocols]
+source = "gitlab"
+host = "https://gitlab.freedesktop.org"
+gitlab = "wayland/wayland-protocols"
+use_max_tag = true
+
+[libxkbcommon]
+source = "github"
+github = "xkbcommon/libxkbcommon"
+use_max_tag = true
+prefix = "xkbcommon-"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Apps / tools (GitHub examples)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# [some-github-app]
+# source = "github"
+# github = "owner/repo"
+# use_latest_release = true   # use this for packages with proper GitHub Releases
+# # use_max_tag = true         # use this for repos that only push git tags
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PyPI packages (if any)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# [python-example]
+# source = "pypi"
+# pypi = "example-package"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# AUR packages (if any — useful to cross-check versions)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# [some-aur-package]
+# source = "aur"
+# aur = "package-name-in-aur"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Generic HTTP / regex (last resort)
+# ══════════════════════════════════════════════════════════════════════════════
+
+# [some-package-with-custom-page]
+# source = "regex"
+# url = "https://example.com/downloads/"
+# regex = 'some-package-(\d[\d.]+)\.tar'
+# use_max_version = true
