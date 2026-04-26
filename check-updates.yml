@@ -1,0 +1,181 @@
+name: Check Upstream Versions & Trigger OBS
+
+on:
+  schedule:
+    # Runs every 6 hours — adjust as needed (cron syntax: min hour day month weekday)
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    # Allows you to manually trigger this from the GitHub Actions UI
+    inputs:
+      dry_run:
+        description: 'Dry run (check versions only, do NOT trigger OBS)'
+        required: false
+        default: 'false'
+        type: boolean
+      force_package:
+        description: 'Force-trigger a specific package name (leave empty to check all)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write   # needed to commit updated versions.json back to the repo
+
+jobs:
+  check-and-trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── 1. Checkout the repo ─────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # fetch full history so we can push back the updated versions.json
+          fetch-depth: 1
+
+      # ── 2. Set up Python ─────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # ── 3. Install dependencies ───────────────────────────────────────────
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install 'nvchecker[all]' requests
+
+      # ── 4. Validate secrets are present ──────────────────────────────────
+      - name: Validate required secrets
+        run: |
+          if [ -z "${{ secrets.OBS_TOKEN }}" ]; then
+            echo "❌ ERROR: OBS_TOKEN secret is not set."
+            echo "   See README.md for how to create an OBS token."
+            exit 1
+          fi
+          echo "✅ OBS_TOKEN is present"
+
+      # ── 5. Run nvchecker to detect new upstream versions ──────────────────
+      - name: Run nvchecker
+        env:
+          # Provides read-only GitHub API access for rate limits
+          NVCHECKER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: your own fine-grained PAT for higher GitHub API rate limits
+          # NVCHECKER_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_PAT }}
+        run: |
+          echo "Running nvchecker against nvchecker.toml ..."
+          # --logger json emits structured output; errors go to stderr
+          nvchecker \
+            -c nvchecker.toml \
+            --logger json \
+            2>nvchecker_errors.log | tee nvchecker_output.jsonl || true
+
+          # Show any errors so they surface in the workflow logs
+          if [ -s nvchecker_errors.log ]; then
+            echo ""
+            echo "⚠️  nvchecker warnings / errors:"
+            cat nvchecker_errors.log
+          fi
+
+      # ── 6. (Optional) Force-trigger a single package ──────────────────────
+      - name: Force-trigger specific package (if requested)
+        if: ${{ github.event.inputs.force_package != '' }}
+        env:
+          OBS_TOKEN: ${{ secrets.OBS_TOKEN }}
+          OBS_PROJECT: ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
+          FORCE_PACKAGE: ${{ github.event.inputs.force_package }}
+        run: |
+          python scripts/trigger_obs.py --force-package "$FORCE_PACKAGE"
+
+      # ── 7. Diff versions and trigger OBS for updated packages ─────────────
+      - name: Trigger OBS service runs for updated packages
+        if: ${{ github.event.inputs.force_package == '' }}
+        env:
+          OBS_TOKEN: ${{ secrets.OBS_TOKEN }}
+          OBS_PROJECT: ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          python scripts/trigger_obs.py \
+            --old-versions versions.json \
+            --new-versions versions_new.json \
+            --output-summary trigger_summary.json
+
+      # ── 8. Show a summary in the workflow log ─────────────────────────────
+      - name: Print trigger summary
+        if: always()
+        run: |
+          if [ -f trigger_summary.json ]; then
+            echo "=== Trigger Summary ==="
+            python -c "
+          import json, sys
+          with open('trigger_summary.json') as f:
+              s = json.load(f)
+          print(f\"Packages checked : {s.get('checked', 0)}\")
+          print(f\"Updates found    : {s.get('updated', 0)}\")
+          print(f\"OBS triggers sent: {s.get('triggered', 0)}\")
+          print(f\"Failures         : {s.get('failed', 0)}\")
+          if s.get('updated_list'):
+              print('')
+              print('Updated packages:')
+              for p in s['updated_list']:
+                  print(f\"  {p['package']}: {p['old']} -> {p['new']} [{p['status']}]\")
+          if s.get('failed_list'):
+              print('')
+              print('Failed packages:')
+              for p in s['failed_list']:
+                  print(f\"  {p['package']}: {p['error']}\")
+            "
+          fi
+
+      # ── 9. Commit updated versions.json back to the repository ────────────
+      - name: Commit updated versions.json
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          if [ ! -f versions_new.json ]; then
+            echo "No new versions file produced — nothing to commit."
+            exit 0
+          fi
+
+          # Merge new versions into versions.json
+          python -c "
+          import json
+          try:
+              with open('versions.json') as f:
+                  old = json.load(f)
+          except (FileNotFoundError, json.JSONDecodeError):
+              old = {}
+          with open('versions_new.json') as f:
+              new = json.load(f)
+          merged = {**old, **new}
+          with open('versions.json', 'w') as f:
+              json.dump(merged, f, indent=2, sort_keys=True)
+              f.write('\n')
+          print(f'Merged {len(new)} entries into versions.json')
+          "
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add versions.json
+
+          # Only commit if something changed
+          if git diff --staged --quiet; then
+            echo "versions.json is unchanged — skipping commit."
+          else
+            git commit -m "chore: update known package versions [skip ci]"
+            git push
+            echo "✅ Pushed updated versions.json"
+          fi
+
+      # ── 10. Upload logs as artifacts for debugging ───────────────────────
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nvchecker-run-${{ github.run_number }}
+          path: |
+            nvchecker_output.jsonl
+            nvchecker_errors.log
+            trigger_summary.json
+          retention-days: 14
