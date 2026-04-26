@@ -140,9 +140,17 @@ jobs:
           def load(path):
               try:
                   with open(path) as f:
-                      return json.load(f)
+                      raw = json.load(f)
               except (FileNotFoundError, json.JSONDecodeError):
                   return {}
+              # Unwrap nvchecker v2 envelope: {"version": 2, "data": {...}}
+              if isinstance(raw.get("version"), int) and isinstance(raw.get("data"), dict):
+                  raw = raw["data"]
+              # Flatten dict values to plain version strings
+              return {
+                  k: (v.get("version", str(v)) if isinstance(v, dict) else str(v))
+                  for k, v in raw.items()
+              }
 
           old = load("${{ env.VERSIONS_OLD }}")
           new = load("${{ env.VERSIONS_NEW }}")
@@ -256,42 +264,62 @@ jobs:
 
       # ── 10. Commit updated versions.json ──────────────────────────────────
       - name: Commit updated versions.json
-        # Skip on dry runs; also guard against the scheduled path where
-        # github.event.inputs is null (the || 'false' coalesces to 'false').
-        if: ${{ (github.event.inputs.dry_run || 'false') != 'true' }}
+        # always() ensures this step runs even when a prior step exits non-zero
+        # (e.g. trigger_obs.py returning 1 because one package failed to trigger).
+        # Without always(), GitHub Actions skips this step on any prior failure,
+        # which is exactly what kept versions.json stuck at {} forever.
+        # The dry-run guard is still enforced via the second condition.
+        if: ${{ always() && (github.event.inputs.dry_run || 'false') != 'true' }}
         run: |
           set -euo pipefail
 
-          # Smart merge: commit new versions only for packages that succeeded.
-          # Packages in failed_list keep their OLD version in versions.json so
-          # they are detected as changed again on the next run and retried.
-          # This replaces the old "abort on any failure" guard, which caused
-          # versions.json to stay {} forever whenever even one package failed.
+          # Smart merge:
+          #   - Packages that triggered successfully  → advance their version
+          #   - Packages in failed_list              → keep old version (retry next run)
+          #   - versions_new.json may be a nvchecker v2 envelope {"version":2,"data":{...}}
+          #     so we unwrap it the same way trigger_obs.py does.
           python - <<'EOF'
-          import json, sys
+          import json
 
-          def load(path):
+          def load_flat(path):
+              """Load a versions file and return a flat {pkg: version_str} dict."""
+              try:
+                  with open(path) as f:
+                      raw = json.load(f)
+              except (FileNotFoundError, json.JSONDecodeError):
+                  return {}
+              # Unwrap nvchecker v2 envelope
+              if isinstance(raw.get("version"), int) and isinstance(raw.get("data"), dict):
+                  raw = raw["data"]
+              return {
+                  k: (v.get("version", str(v)) if isinstance(v, dict) else str(v))
+                  for k, v in raw.items()
+              }
+
+          def load_json(path):
               try:
                   with open(path) as f:
                       return json.load(f)
               except (FileNotFoundError, json.JSONDecodeError):
                   return {}
 
-          old     = load("versions.json")
-          new     = load("versions_new.json")
-          summary = load("trigger_summary.json")
+          old     = load_flat("versions.json")
+          new     = load_flat("versions_new.json")
+          summary = load_json("trigger_summary.json")
 
-          # Packages that failed the OBS trigger — retain their old version
-          # so they are picked up again on the next scheduled run.
+          # Packages whose OBS trigger failed — hold back so they retry next run
           failed_pkgs = {p["package"] for p in summary.get("failed_list", [])}
           if failed_pkgs:
               print(f"⚠️  {len(failed_pkgs)} package(s) failed triggering — "
-                    f"their versions will NOT be advanced: {', '.join(sorted(failed_pkgs))}")
+                    f"held back for retry: {', '.join(sorted(failed_pkgs))}")
 
-          # Build merged dict: start from old, apply new except for failures.
           merged = dict(old)
           added = changed = skipped = 0
           for pkg, ver in new.items():
+              # Also skip null/empty versions that slipped through
+              if not ver or ver.strip().lower() == "null":
+                  skipped += 1
+                  continue
               if pkg in failed_pkgs:
                   skipped += 1
                   continue
@@ -306,7 +334,7 @@ jobs:
               f.write("\n")
 
           print(f"Merged {len(new)} entries: {changed} updated, "
-                f"{added} newly tracked, {skipped} held back (failed).")
+                f"{added} newly tracked, {skipped} held back.")
           EOF
 
           git config user.name  "github-actions[bot]"
@@ -317,7 +345,6 @@ jobs:
             echo "versions.json is unchanged — skipping commit."
           else
             # Rebase onto any commits that landed while this job was running
-            # (e.g. a manually triggered run overlapping with a scheduled one).
             git pull --rebase --autostash origin HEAD
             git commit -m "chore: update known package versions [skip ci]"
             git push
