@@ -414,9 +414,19 @@ def find_updated_packages(
     """
     Return (package, old_ver, new_ver) for every package whose version changed
     or that is newly seen.
+
+    Packages where nvchecker returned a null or empty version are silently
+    skipped -- they indicate a fetch failure, not a real version, and must
+    never be committed to versions.json or used to trigger OBS.
     """
     updates = []
     for pkg, new_ver in new.items():
+        # Guard: nvchecker sometimes emits the bare string "null" or an empty
+        # string when it cannot determine a version (e.g. the release asset
+        # query returned no results).  Treat both as "no data".
+        if not new_ver or new_ver.strip().lower() == "null":
+            print(f"  SKIP {pkg}: nvchecker returned null/empty version -- will retry next run")
+            continue
         old_ver = old.get(pkg)
         if new_ver != old_ver:
             updates.append((pkg, old_ver or "unknown", new_ver))

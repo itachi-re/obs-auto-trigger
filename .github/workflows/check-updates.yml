@@ -258,19 +258,17 @@ jobs:
       - name: Commit updated versions.json
         # Skip on dry runs; also guard against the scheduled path where
         # github.event.inputs is null (the || 'false' coalesces to 'false').
-        if: ${{ github.event.inputs.dry_run != 'true' }}
+        if: ${{ (github.event.inputs.dry_run || 'false') != 'true' }}
         run: |
           set -euo pipefail
 
-          # Prevent committing bad state if triggers failed
-          if [ -f trigger_summary.json ] && grep -q '"failed": [1-9]' trigger_summary.json; then
-            echo "❌ Some OBS triggers failed — skipping commit to avoid bad state"
-            exit 1
-          fi
-
-          # Merge new detections into versions.json, reporting what changed.
+          # Smart merge: commit new versions only for packages that succeeded.
+          # Packages in failed_list keep their OLD version in versions.json so
+          # they are detected as changed again on the next run and retried.
+          # This replaces the old "abort on any failure" guard, which caused
+          # versions.json to stay {} forever whenever even one package failed.
           python - <<'EOF'
-          import json
+          import json, sys
 
           def load(path):
               try:
@@ -279,18 +277,36 @@ jobs:
               except (FileNotFoundError, json.JSONDecodeError):
                   return {}
 
-          old    = load("versions.json")
-          new    = load("versions_new.json")
-          merged = {**old, **new}
+          old     = load("versions.json")
+          new     = load("versions_new.json")
+          summary = load("trigger_summary.json")
 
-          added   = len([k for k in new if k not in old])
-          changed = len([k for k in new if k in old and old[k] != new[k]])
+          # Packages that failed the OBS trigger — retain their old version
+          # so they are picked up again on the next scheduled run.
+          failed_pkgs = {p["package"] for p in summary.get("failed_list", [])}
+          if failed_pkgs:
+              print(f"⚠️  {len(failed_pkgs)} package(s) failed triggering — "
+                    f"their versions will NOT be advanced: {', '.join(sorted(failed_pkgs))}")
+
+          # Build merged dict: start from old, apply new except for failures.
+          merged = dict(old)
+          added = changed = skipped = 0
+          for pkg, ver in new.items():
+              if pkg in failed_pkgs:
+                  skipped += 1
+                  continue
+              if pkg not in old:
+                  added += 1
+              elif old[pkg] != ver:
+                  changed += 1
+              merged[pkg] = ver
 
           with open("versions.json", "w") as f:
               json.dump(merged, f, indent=2, sort_keys=True)
               f.write("\n")
 
-          print(f"Merged {len(new)} entries: {changed} updated, {added} newly tracked.")
+          print(f"Merged {len(new)} entries: {changed} updated, "
+                f"{added} newly tracked, {skipped} held back (failed).")
           EOF
 
           git config user.name  "github-actions[bot]"
