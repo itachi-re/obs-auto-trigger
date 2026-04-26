@@ -17,6 +17,30 @@ Upstream (GitHub / KDE invent / freedesktop…)
    versions.json updated & committed back to this repo
 ```
 
+```
+                ┌──────────────────────────┐
+                │   GitHub "control repo"  │
+                │  (your single repo)      │
+                └────────────┬─────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                     │
+ Upstream APIs       Version tracking      Scheduler (cron)
+ (GitHub releases)   (JSON/YAML DB)        (GitHub Actions)
+        │                    │                     │
+        └──────────────┬─────┴─────────────────────┘
+                       │                   │
+               Detect new versions         │
+                       │                   │
+                       └───────┬───────────┘
+                               │
+                      Trigger OBS API
+                               │
+                ┌──────────────▼──────────────┐
+                │   Open Build Service (OBS)  │
+                │ osc service rr / rebuild    │
+                └─────────────────────────────┘
+```
 ---
 
 ## Table of Contents
