@@ -39,15 +39,15 @@ android_sdk = "build-tools"
 repo = "package"
 channel = "stable"
 
-[android-platform-tools]
-source = "android_sdk"
-android_sdk = "platform-tools"
-repo = "package"
+#[android-platform-tools]
+#source = "android_sdk"
+#android_sdk = "platform-tools"
+#repo = "package"
 
-[android-studio]
-source = "github"
-github = "itachi-re/android-studio-obs"
-use_max_tag = true
+#[android-studio]
+#source = "github"
+#github = "itachi-re/android-studio-obs"
+#use_max_tag = true
 
 [libgbinder]
 source = "github"
@@ -100,10 +100,10 @@ use_max_tag = true
 # Arch Linux tools
 # ══════════════════════════════════════════════════════════════════════════════
 
-[arch-install-scripts]
-source = "github"
-github = "archlinux/arch-install-scripts"
-use_max_tag = true
+#[arch-install-scripts]
+#source = "github"
+#github = "archlinux/arch-install-scripts"
+#use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Fun / Terminal toys
@@ -113,11 +113,6 @@ use_max_tag = true
 source = "github"
 github = "itachi-re/asciiquarium"
 use_max_tag = true
-
-[perl-Term-Animation]
-# Term::Animation is the Perl module asciiquarium depends on
-source = "cpan"
-cpan = "Term-Animation"
 
 [pipes-rs]
 source = "github"
@@ -191,28 +186,21 @@ use_max_tag = true
 # Browsers
 # ══════════════════════════════════════════════════════════════════════════════
 
-[brave-browser]
-source = "github"
-github = "brave/brave-browser"
-use_max_tag = true
+#[brave-browser]
+#source = "github"
+#github = "brave/brave-browser"
+#use_max_tag = true
 
-[ff-dev-edition]
-source = "github"
-github = "itachi-re/ff-dev-obs"
-use_max_tag = true
+#[ff-dev-edition]
+#source = "github"
+#github = "itachi-re/ff-dev-obs"
+#use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Network / VPN
 # ══════════════════════════════════════════════════════════════════════════════
 
 [cloudflare-warp]
-source = "github"
-github = "cloudflare/cloudflared"
-use_latest_release = true
-
-# cloudflare_warp (underscore): duplicate of cloudflare-warp. REMOVED.
-[cloudflare_warp]
-# Official Cloudflare WARP Linux client
 source = "github"
 github = "cloudflare/cloudflared"
 use_latest_release = true
