@@ -11,15 +11,6 @@ newver = "versions_new.json"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Microsoft / DirectX
-# ══════════════════════════════════════════════════════════════════════════════
-
-[DirectXShaderCompiler]
-source = "github"
-github = "microsoft/DirectXShaderCompiler"
-use_max_tag = true
-
-# ══════════════════════════════════════════════════════════════════════════════
 # Android / Waydroid ecosystem
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -394,6 +385,15 @@ git = "https://gitlab.com/xanmod/linux.git"
 use_max_tag = true
 
 # kernel-copyto: custom/local kernel module — no public upstream. Skip.
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Microsoft / DirectX
+# ══════════════════════════════════════════════════════════════════════════════
+
+[DirectXShaderCompiler]
+source = "github"
+github = "microsoft/DirectXShaderCompiler"
+use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Lua / Perl / Python packages
