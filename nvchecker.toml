@@ -235,6 +235,11 @@ use_latest_release = true
 source = "anitya"
 anitya = "fedora/codeblocks"
 
+[obsidian]
+source = "github"
+github = "obsidianmd/obsidian-releases"
+use_max_tag = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Fonts
 # ══════════════════════════════════════════════════════════════════════════════
