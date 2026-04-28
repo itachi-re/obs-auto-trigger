@@ -181,7 +181,7 @@ use_max_tag = true
 source = "jq"
 url = "https://api.github.com/repos/brave/brave-browser/releases?per_page=20"
 filter = '[.[] | select(.name | startswith("Beta"))] | first | .tag_name | ltrimstr("v")'
-httptoken = "Bearer ${NVCHECKER_GITHUB_TOKEN}"
+httptoken = "Bearer ${NVCHECKER_PAT}"
 
 #[brave-origin-beta]
 #source = "regex"
