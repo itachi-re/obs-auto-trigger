@@ -177,7 +177,7 @@ use_max_tag = true
 # Browsers
 # ══════════════════════════════════════════════════════════════════════════════
 
-[brave-browser-beta]
+[brave-origin-beta]
 source = "github"
 github = "brave/brave-browser"
 use_max_tag = true
