@@ -178,10 +178,9 @@ use_max_tag = true
 # ══════════════════════════════════════════════════════════════════════════════
 
 [brave-origin-beta]
-source = "httpjson"
-url = "https://api.github.com/repos/brave/brave-browser/releases?per_page=5"
-jmespath = "[?contains(name, 'Beta')].tag_name | [0]"
-prefix = "v"
+source = "regex"
+url = "https://versions.brave.com/latest/brave-versions.json"
+regex = '"name":"(1\.[0-9]+\.[0-9]+)","channel":"beta"'
 
 #[brave-browser]
 #source = "github"
