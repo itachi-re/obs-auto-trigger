@@ -178,9 +178,9 @@ use_max_tag = true
 # ══════════════════════════════════════════════════════════════════════════════
 
 [brave-origin-beta]
-source = "github"
-github = "brave/brave-browser"
-use_max_tag = true
+source = "httpjson"
+url = "https://api.github.com/repos/brave/brave-browser/releases?per_page=5"
+jmespath = "[?contains(name, 'Beta')].tag_name | [0]"
 prefix = "v"
 
 #[brave-browser]
