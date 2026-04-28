@@ -177,6 +177,12 @@ use_max_tag = true
 # Browsers
 # ══════════════════════════════════════════════════════════════════════════════
 
+[brave-browser-beta]
+source = "github"
+github = "brave/brave-browser"
+use_max_tag = true
+tag_prefix = "v"
+
 #[brave-browser]
 #source = "github"
 #github = "brave/brave-browser"
