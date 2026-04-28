@@ -61,6 +61,11 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install 'nvchecker[all]' requests
+          
+      - name: Verify nvchecker jq support
+        run: |
+          python3 -c "import nvchecker_source.jq; print('✅ jq source available')" \
+            || echo "❌ jq source NOT available — falling back to regex"    
 
       # ── 4. Validate required secrets ─────────────────────────────────────
       # Secrets must be surfaced through env vars — embedding them directly in
