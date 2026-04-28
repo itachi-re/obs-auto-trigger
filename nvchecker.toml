@@ -181,7 +181,7 @@ use_max_tag = true
 source = "github"
 github = "brave/brave-browser"
 use_max_tag = true
-tag_prefix = "v"
+prefix = "v"
 
 #[brave-browser]
 #source = "github"
