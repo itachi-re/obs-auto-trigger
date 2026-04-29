@@ -1,6 +1,13 @@
 name: Check Upstream Versions & Trigger OBS
 
 on:
+push:
+    branches:
+      - main
+    paths:
+      - 'nvchecker.toml'
+      - 'scripts/**'
+      - '.github/workflows/**'
   schedule:
     # Runs every 6 hours (cron syntax: min hour day month weekday)
     - cron: '0 */6 * * *'
