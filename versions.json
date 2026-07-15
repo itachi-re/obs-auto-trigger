@@ -1,6 +1,6 @@
 {
   "DirectXShaderCompiler": "v1.10.2605.24",
-  "TuxManager": "20260618.090107",
+  "TuxManager": "20260715.072615",
   "abdm": "v1.9.2",
   "android-apktool": "v3.0.2",
   "android-build-tools": "37.0.0",
@@ -40,7 +40,7 @@
   "libglibutil": "20260525.173250",
   "lua51-lpeg": "v1.1.0",
   "mangayomi": "v0.7.80",
-  "media-downloader": "12168a184c3eab7b815941c83eec8d0f72c8ea4d",
+  "media-downloader": "1ab79bea3ad8fc81c43f0ee5480b14eb74141983",
   "megacubo": "v17.6.8",
   "monaspace-fonts": "v1.400",
   "nerd-fonts": "v3.4.0",
