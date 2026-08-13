@@ -119,6 +119,11 @@ source = "github"
 github = "mkckr0/audio-share"
 use_max_tag = true
 
+[ani-cli]
+source = "git"
+git = "https://github.com/pystardust/ani-cli.git"
+use_max_release = true
+
 [hypnotix]
 source = "github"
 github = "linuxmint/hypnotix"
