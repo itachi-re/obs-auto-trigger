@@ -346,10 +346,10 @@ source = "github"
 github = "DavidoTek/ProtonUp-Qt"
 use_max_tag = true
 
-#[ProtonPlus]
-#source = "git"
-#git = "https://github.com/Vysp3r/ProtonPlus.git"
-#use_max_release = true
+[ProtonPlus]
+source = "git"
+git = "https://github.com/Vysp3r/ProtonPlus.git"
+use_max_release = true
 
 [vermouth]
 source = "git"
