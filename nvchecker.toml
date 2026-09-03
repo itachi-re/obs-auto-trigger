@@ -361,6 +361,11 @@ source = "git"
 git = "https://github.com/ValveSoftware/gamescope.git"
 use_max_tag = true
 
+[lumafly]
+source = "git"
+git = "https://github.com/TheMulhima/Lumafly.git"
+use_max_release = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Manga / Comics
 # ══════════════════════════════════════════════════════════════════════════════
