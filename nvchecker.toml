@@ -366,6 +366,11 @@ source = "git"
 git = "https://github.com/TheMulhima/Lumafly.git"
 use_max_release = true
 
+[scarab]
+source = "git"
+git = "https://github.com/fifty-six/Scarab.git"
+use_max_release = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Manga / Comics
 # ══════════════════════════════════════════════════════════════════════════════
