@@ -326,6 +326,11 @@ source = "github"
 github = "Faugus/faugus-launcher"
 use_max_tag = true
 
+[hydra-launcher]
+source = "git"
+git = "https://github.com/hydralauncher/hydra.git"
+use_max_release = true
+
 [protonup-qt]
 source = "github"
 github = "DavidoTek/ProtonUp-Qt"
