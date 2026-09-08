@@ -247,7 +247,7 @@ use_max_release = true
 [cloudflare-warp]
 source = "regex"
 url = "https://developers.cloudflare.com/changelog/rss/index.xml"
-regex = "Cloudflare One Client for Linux \\(version ([\\d.]+)\\)"
+regex = 'Cloudflare One Client for Linux \(version ([\d.]+)\)'
 
 [wgcf]
 source = "github"
