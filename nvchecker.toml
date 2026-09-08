@@ -245,8 +245,9 @@ use_max_release = true
 # ══════════════════════════════════════════════════════════════════════════════
 
 [cloudflare-warp]
-source = "cmd"
-cmd = "curl -s 'https://pkg.cloudflareclient.com/dists/noble/main/binary-amd64/Packages.gz' | zcat | awk '/^Package: cloudflare-warp/{found=1} found && /^Version:/{print $2; exit}'"
+source = "regex"
+url = "https://developers.cloudflare.com/changelog/rss/index.xml"
+regex = "Cloudflare One Client for Linux \\(version ([\\d.]+)\\)"
 
 [wgcf]
 source = "github"
