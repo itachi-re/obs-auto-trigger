@@ -293,6 +293,11 @@ source = "github"
 github = "linux-rockchip/rkflashtool"
 use_commit = true
 
+[zed]
+source = "git"
+git = "https://github.com/zed-industries/zed.git"
+use_max_tag = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Fonts
 # ══════════════════════════════════════════════════════════════════════════════
