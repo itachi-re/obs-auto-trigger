@@ -1,6 +1,6 @@
 {
   "DirectXShaderCompiler": "v1.10.2605.37",
-  "ProtonPlus": "v0.6.6",
+  "ProtonPlus": "v0.6.7",
   "TuxManager": "20260908.161959",
   "abdm": "v1.10.4",
   "android-apktool": "v3.0.3",
@@ -36,8 +36,8 @@
   "joplin-desktop": "v3.7.16",
   "kde-material-you-colors": "v2.2.0",
   "kernel-xanmod-v3": "7.2.4-xanmod1",
-  "komikku": "v50.13.0",
-  "krita": "20260908",
+  "komikku": "v50.14.0",
+  "krita": "20260909",
   "kseexpr": "v6.0.0.0",
   "kurve": "v3.6.1",
   "libgbinder": "20260723.150157",
