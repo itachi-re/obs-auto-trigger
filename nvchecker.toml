@@ -139,6 +139,11 @@ source = "git"
 git = "https://github.com/EdenwareApps/Megacubo.git"
 use_max_tag = true
 
+[nicotine+]
+source = "git"
+git = "https://github.com/nicotine-plus/nicotine-plus.git"
+use_max_tag = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Email
 # ══════════════════════════════════════════════════════════════════════════════
