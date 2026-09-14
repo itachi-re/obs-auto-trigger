@@ -30,6 +30,14 @@ android_sdk = "build-tools"
 repo = "package"
 channel = "stable"
 
+[android-ndk]
+source = "android_sdk"
+android_sdk = "ndk"
+repo = "package"
+channel = "stable"
+from_pattern = '^(\d+)\..*'
+to_pattern = '\1'
+
 #[android-platform-tools]
 #source = "android_sdk"
 #android_sdk = "platform-tools"
