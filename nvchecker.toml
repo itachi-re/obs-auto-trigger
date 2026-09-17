@@ -142,6 +142,11 @@ source = "git"
 git = "https://github.com/4gray/iptvnator.git"
 use_max_tag = true
 
+[limusic]
+source = "git"
+git = "https://github.com/SimoHypers/limusic.git"
+use_max_release = true
+
 [megacubo]
 source = "git"
 git = "https://github.com/EdenwareApps/Megacubo.git"
