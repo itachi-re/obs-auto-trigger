@@ -152,6 +152,11 @@ source = "git"
 git = "https://github.com/nicotine-plus/nicotine-plus.git"
 use_max_tag = true
 
+[pear-desktop]
+source = "git"
+git = "https://github.com/pear-devs/pear-desktop.git"
+use_max_release = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Email
 # ══════════════════════════════════════════════════════════════════════════════
