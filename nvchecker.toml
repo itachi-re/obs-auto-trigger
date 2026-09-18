@@ -162,6 +162,10 @@ source = "git"
 git = "https://github.com/pear-devs/pear-desktop.git"
 use_max_release = true
 
+[sonora]
+source = "git"
+git = "https://github.com/sonorahq/sonora.git"
+use_max_release = true
 # ══════════════════════════════════════════════════════════════════════════════
 # Email
 # ══════════════════════════════════════════════════════════════════════════════
