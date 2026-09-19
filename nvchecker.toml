@@ -190,6 +190,11 @@ github = "laurent22/joplin"
 use_latest_release = true
 include_regex = "^v[\\d.]+$"
 
+[tolaria]
+source = "github"
+github = "refactoringhq/tolaria"
+use_latest_release = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # System utilities
 # ══════════════════════════════════════════════════════════════════════════════
