@@ -77,9 +77,10 @@ use_max_tag = true
 # projects — tracking them makes no sense. REMOVED.
 
 [waydroid-kmp-default]
-source = "github"
-github = "llyyr/anbox-modules"
-use_max_tag = true
+source = "git"
+git = "https://github.com/llyyr/anbox-modules"
+branch = "master"
+use_commit = true
 
 [waydroid-magisk]
 source = "github"
