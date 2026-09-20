@@ -179,7 +179,7 @@ jobs:
           NV_PRODUCED: ${{ steps.nvchecker.outputs.produced }}
         run: |
           python - <<'EOF'
-          import json, os, sys, tomllib
+          import json, os, re, sys, tomllib
 
           with open("nvchecker.toml", "rb") as f:
               cfg = tomllib.load(f)
@@ -204,9 +204,15 @@ jobs:
                           continue
                       name = str(rec.get("name") or "(global)")
                       msg = str(rec.get("event") or "").strip().replace("\n", " ")
-                      exc = rec.get("exc_info")
-                      if isinstance(exc, str) and exc.strip():
-                          msg = f"{msg} | {exc.strip().splitlines()[-1]}"
+                      # nvchecker logs the useful part in "error"; "event" is
+                      # often just "unexpected error happened".
+                      err = str(rec.get("error") or "").strip().replace("\n", " ")
+                      m = re.match(r"HTTPError\((\d+)", err)
+                      if m:
+                          u = re.search(r"effective_url='([^']+)'", err)
+                          err = f"HTTP {m.group(1)}" + (f" {u.group(1)}" if u else "")
+                      if err and err not in msg:
+                          msg = f"{msg} — {err}" if msg else err
                       errors.setdefault(name, msg[:300])
 
           produced = os.environ.get("NV_PRODUCED") == "true"
@@ -460,13 +466,22 @@ jobs:
             exit 0
           fi
 
-          # Commit FIRST, then rebase. (Rebasing with staged changes +
-          # --autostash un-stages them, and the following `git commit` then
-          # fails with "nothing to commit".)
+          # Commit FIRST, then rebase.
           git commit -m "chore: update known package versions [skip ci]"
 
+          # Show anything else that is dirty. Scratch files that are tracked
+          # in the repo (e.g. versions_new.json, rewritten by nvchecker) make
+          # a plain `git pull --rebase` refuse with "You have unstaged
+          # changes". --autostash sets them aside for the rebase and puts
+          # them back afterwards (they are still needed for the artifact
+          # upload). Long-term fix: `git rm --cached versions_new.json` and
+          # add it to .gitignore.
+          echo "── other modified files (should be empty) ──"
+          git status --short
+          echo "────────────────────────────────────────────"
+
           for attempt in 1 2 3; do
-            if git pull --rebase origin "${GITHUB_REF_NAME}" \
+            if git pull --rebase --autostash origin "${GITHUB_REF_NAME}" \
                && git push origin "HEAD:${GITHUB_REF_NAME}"; then
               echo "✅ Pushed updated versions.json"
               exit 0
