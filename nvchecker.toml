@@ -3,8 +3,9 @@
 # Docs: https://nvchecker.readthedocs.io/en/latest/usage.html
 
 [__config__]
-oldver = "versions.json"
-newver = "versions_new.json"
+oldver  = "versions.json"
+newver  = "versions_new.json"
+keyfile = ".nvchecker_keyfile.toml"
 max_concurrency = 3
 # Optional: GitHub token for higher API rate limits
 # keyfile = ".nvchecker_keyfile.toml"
