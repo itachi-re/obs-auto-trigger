@@ -25,7 +25,7 @@ on:
         type: string
 
 # ── Concurrency guard ────────────────────────────────────────────────────────
-# Prevents two scheduled runs from overlapping and racing on the git push.
+# Prevents two runs from overlapping and racing on the git push.
 # cancel-in-progress: false lets the running job finish; new runs queue behind it.
 concurrency:
   group: obs-check-${{ github.ref }}
@@ -34,14 +34,19 @@ concurrency:
 permissions:
   contents: write   # needed to commit versions.json back to the repo
 
-# ── Job-level env vars ───────────────────────────────────────────────────────
-# Defined once here; referenced via ${{ env.X }} below to avoid repetition.
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  OBS_PROJECT:    ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
-  VERSIONS_OLD:   versions.json
-  VERSIONS_NEW:   versions_new.json
-  PYTHON_VERSION: '3.12'
+  OBS_PROJECT:     ${{ vars.OBS_PROJECT || 'home:itachi_re' }}
+  VERSIONS_OLD:    versions.json
+  VERSIONS_NEW:    versions_new.json
+  # Must match `keyfile = ...` in nvchecker.toml [__config__]. Generated at
+  # runtime from a secret and NEVER committed (add it to .gitignore).
+  KEYFILE:         .nvchecker_keyfile.toml
+  PYTHON_VERSION:  '3.12'
+  # Fail the run (and skip OBS triggers) if more than this fraction of the
+  # entries in nvchecker.toml errored. Below it, the run continues with the
+  # entries that did succeed and errored ones are retried next run.
+  MAX_ERROR_RATIO: '0.25'
 
 jobs:
   check-and-trigger:
@@ -56,120 +61,191 @@ jobs:
           fetch-depth: 1
 
       # ── 2. Python setup ──────────────────────────────────────────────────
-      # cache: 'pip' is omitted — it requires a requirements file to produce a
-      # stable cache key and is a no-op without one.
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       # ── 3. Install dependencies ──────────────────────────────────────────
+      # `requests` is kept for trigger_obs.py. The jq *CLI* (used by the
+      # brave-browser-beta `cmd` source) is preinstalled on ubuntu-latest, so
+      # the apt install and the PyPI `jq` package are no longer needed.
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
-          pip install 'nvchecker[all]' requests jq
+          pip install 'nvchecker[all]' requests
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
-      - name: Verify nvchecker jq support
+      - name: Verify tools
         run: |
-          python3 -c "import nvchecker_source.jq; print('✅ jq source available')" \
-            || echo "❌ jq source NOT available — falling back to regex"
+          nvchecker --version
+          jq --version
 
       # ── 4. Validate required secrets ─────────────────────────────────────
-      # Secrets must be surfaced through env vars — embedding them directly in
-      # shell expressions (e.g. if [ -z "${{ secrets.X }}" ]) prints the value
-      # in the runner's expanded command log, defeating masking.
+      # Secrets go through env vars — embedding them in shell expressions
+      # would print them in the expanded command log.
       - name: Validate required secrets
         env:
           _OBS_TOKEN: ${{ secrets.OBS_TOKEN }}
         run: |
           set -euo pipefail
-          rc=0
           if [ -z "${_OBS_TOKEN}" ]; then
-            echo "❌ ERROR: OBS_TOKEN secret is not set."
-            echo "   See README.md for instructions on creating an OBS token."
-            rc=1
+            echo "::error::OBS_TOKEN secret is not set. See README.md for instructions on creating an OBS token."
+            exit 1
           fi
-          [ "$rc" -eq 0 ] && echo "✅ All required secrets are present."
-          exit "$rc"
+          echo "✅ All required secrets are present."
 
       # ── 5. Bootstrap versions.json on first run ───────────────────────────
-      # nvchecker needs an existing keyfile; create an empty one if absent.
       - name: Bootstrap versions.json if missing
         run: |
           set -euo pipefail
-          if [ ! -f "${{ env.VERSIONS_OLD }}" ]; then
-            echo "{}" > "${{ env.VERSIONS_OLD }}"
-            echo "ℹ️  Created empty ${{ env.VERSIONS_OLD }} (first run)."
+          if [ ! -f "$VERSIONS_OLD" ]; then
+            echo "{}" > "$VERSIONS_OLD"
+            echo "ℹ️  Created empty $VERSIONS_OLD (first run)."
           fi
 
-      # ── Debug GitHub Auth (Moved Here) ────────────────────────────────────
-      - name: Debug GitHub auth
+      # ── 6. Check GitHub API auth / rate limit ─────────────────────────────
+      # Fails fast on a bad/expired token (HTTP 401) and warns when the
+      # GraphQL budget (used by nvchecker's github source) is nearly gone.
+      - name: Check GitHub API auth and rate limit
         env:
-          TOKEN: ${{ secrets.NVCHECKER_PAT || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.NVCHECKER_PAT || secrets.GITHUB_TOKEN }}
         run: |
-          python - <<'EOF'
-          import requests, os
+          set -euo pipefail
+          resp=$(curl -fsS \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/rate_limit)
+          echo "$resp" | jq -r '.resources | "core: \(.core.remaining)/\(.core.limit)   graphql: \(.graphql.remaining)/\(.graphql.limit)"'
+          remaining=$(echo "$resp" | jq -r '.resources.graphql.remaining')
+          if [ "$remaining" -lt 100 ]; then
+            echo "::warning::Low GitHub GraphQL rate limit: ${remaining} requests left"
+          fi
 
-          token = os.environ["TOKEN"]
+      # ── 7. Write nvchecker keyfile ────────────────────────────────────────
+      # nvchecker reads API tokens from a keyfile, not from environment
+      # variables. Without it every github-source lookup is unauthenticated.
+      - name: Write nvchecker keyfile
+        env:
+          GH_TOKEN: ${{ secrets.NVCHECKER_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          umask 077
+          printf '[keys]\ngithub = "%s"\n' "${GH_TOKEN}" > "$KEYFILE"
+          echo "✅ Wrote $KEYFILE"
 
-          r = requests.get(
-            "https://api.github.com/rate_limit",
-            headers={"Authorization": f"Bearer {token}"}
-          )
-
-          print(r.json())
-          EOF
-
-      # ── 6. Run nvchecker ──────────────────────────────────────────────────
-      # File paths are declared in nvchecker.toml under [__config__]:
-      #   oldver = "versions.json"      ← input:  last-known versions
-      #   newver = "versions_new.json"  ← output: freshly detected versions
-      # Do NOT pass --keyfile / --save here — the toml owns those paths and
-      # the --save flag does not exist in current nvchecker releases.
-      #
-      # nvchecker exits non-zero when updates are found, so || true lets the
-      # pipeline continue; we inspect the outputs ourselves.
-      #
-      # Token priority: prefer a fine-grained PAT (higher rate limits) and
-      # fall back to the built-in GITHUB_TOKEN if NVCHECKER_PAT is not set.
+      # ── 8. Run nvchecker ──────────────────────────────────────────────────
+      # Paths (oldver/newver/keyfile) live in nvchecker.toml [__config__].
+      # nvchecker may exit non-zero on partial errors, so errexit is disabled
+      # around it; the "Analyze" step below decides whether the run is usable.
+      # NVCHECKER_GITHUB_TOKEN is still exported because the brave-browser-beta
+      # `cmd` source reads $NVCHECKER_GITHUB_TOKEN from its shell environment.
       - name: Run nvchecker
         id: nvchecker
         env:
           NVCHECKER_GITHUB_TOKEN: ${{ secrets.NVCHECKER_PAT || secrets.GITHUB_TOKEN }}
         run: |
-          set -euo pipefail
+          rm -f "$VERSIONS_NEW"
           echo "Running nvchecker against nvchecker.toml …"
 
-          nvchecker \
-            -c nvchecker.toml \
-            --logger json \
-            2>nvchecker_errors.log | tee nvchecker_output.jsonl \
-            || true   # allow pipeline to continue even if nvchecker exits non-zero
+          set +e
+          nvchecker -c nvchecker.toml --logger json \
+            2>nvchecker_errors.log | tee nvchecker_output.jsonl
+          rc=${PIPESTATUS[0]}
+          set -e
+          echo "nvchecker exit code: ${rc}"
 
-          # Surface warnings/errors in the workflow log
           if [ -s nvchecker_errors.log ]; then
-            echo ""
-            echo "⚠️  nvchecker warnings / errors:"
+            echo "::group::nvchecker stderr"
             cat nvchecker_errors.log
+            echo "::endgroup::"
           fi
 
-          # Safety net: if nvchecker produced no output file, copy the old one
-          # so downstream steps always have a valid VERSIONS_NEW to work with.
-          if [ ! -f "${{ env.VERSIONS_NEW }}" ]; then
-            echo "ℹ️  No new versions file produced — copying old versions as baseline."
-            cp "${{ env.VERSIONS_OLD }}" "${{ env.VERSIONS_NEW }}"
+          # Record whether nvchecker really wrote a result file, then make sure
+          # downstream steps always have a valid VERSIONS_NEW to read.
+          if [ -f "$VERSIONS_NEW" ]; then
+            echo "produced=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "produced=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::nvchecker produced no $VERSIONS_NEW — using old versions as baseline."
+            cp "$VERSIONS_OLD" "$VERSIONS_NEW"
           fi
 
-      # ── 7. Show human-readable version diff ───────────────────────────────
+      # ── 9. Analyze nvchecker results ──────────────────────────────────────
+      # Surfaces per-package errors (rate limits, bad config, upstream down)
+      # as annotations + job summary instead of letting them pass silently,
+      # and stops the run before any OBS trigger if the result is mostly junk.
+      - name: Analyze nvchecker results
+        env:
+          NV_PRODUCED: ${{ steps.nvchecker.outputs.produced }}
+        run: |
+          python - <<'EOF'
+          import json, os, sys, tomllib
+
+          with open("nvchecker.toml", "rb") as f:
+              cfg = tomllib.load(f)
+          total = sum(1 for k in cfg if k != "__config__")
+
+          errors = {}
+          for path in ("nvchecker_output.jsonl", "nvchecker_errors.log"):
+              if not os.path.exists(path):
+                  continue
+              with open(path, errors="replace") as f:
+                  for line in f:
+                      line = line.strip()
+                      if not line.startswith("{"):
+                          continue
+                      try:
+                          rec = json.loads(line)
+                      except json.JSONDecodeError:
+                          continue
+                      if not isinstance(rec, dict):
+                          continue
+                      if str(rec.get("level", "")).lower() not in {"error", "critical", "exception"}:
+                          continue
+                      name = str(rec.get("name") or "(global)")
+                      msg = str(rec.get("event") or "").strip().replace("\n", " ")
+                      exc = rec.get("exc_info")
+                      if isinstance(exc, str) and exc.strip():
+                          msg = f"{msg} | {exc.strip().splitlines()[-1]}"
+                      errors.setdefault(name, msg[:300])
+
+          produced = os.environ.get("NV_PRODUCED") == "true"
+          max_ratio = float(os.environ.get("MAX_ERROR_RATIO", "0.25"))
+          ratio = (len(errors) / total) if total else 0.0
+
+          print(f"Entries in nvchecker.toml : {total}")
+          print(f"Entries with errors       : {len(errors)} ({ratio:.0%})")
+          for name, msg in sorted(errors.items()):
+              print(f"  ✗ {name}: {msg}")
+          for name, msg in sorted(errors.items())[:10]:
+              print(f"::warning title=nvchecker: {name}::{msg}")
+
+          ghs = os.environ.get("GITHUB_STEP_SUMMARY")
+          if ghs:
+              with open(ghs, "a") as f:
+                  f.write("## nvchecker\n\n")
+                  f.write(f"Checked **{total}** entries — **{len(errors)}** errored ({ratio:.0%}).\n\n")
+                  if errors:
+                      f.write("| Package | Error |\n|---------|-------|\n")
+                      for name, msg in sorted(errors.items()):
+                          safe = msg.replace("|", "\\|")
+                          f.write(f"| `{name}` | {safe} |\n")
+                      f.write("\n")
+
+          if not produced:
+              print("::error::nvchecker did not produce a versions file.")
+              sys.exit(1)
+          if ratio > max_ratio:
+              print(f"::error::{ratio:.0%} of entries errored (limit {max_ratio:.0%}) — "
+                    "not triggering OBS. Check the errors above (rate limit / token?).")
+              sys.exit(1)
+          EOF
+
+      # ── 10. Show human-readable version diff ──────────────────────────────
       - name: Show version diff
         run: |
-          set -euo pipefail
-          echo "=== Version diff (old → new) ==="
           python - <<'EOF'
-          import json, sys
+          import json, os, sys
 
           def load(path):
               try:
@@ -180,17 +256,16 @@ jobs:
               # Unwrap nvchecker v2 envelope: {"version": 2, "data": {...}}
               if isinstance(raw.get("version"), int) and isinstance(raw.get("data"), dict):
                   raw = raw["data"]
-              # Flatten dict values to plain version strings
               return {
                   k: (v.get("version", str(v)) if isinstance(v, dict) else str(v))
                   for k, v in raw.items()
               }
 
-          old = load("${{ env.VERSIONS_OLD }}")
-          new = load("${{ env.VERSIONS_NEW }}")
+          old = load(os.environ["VERSIONS_OLD"])
+          new = load(os.environ["VERSIONS_NEW"])
 
+          print("=== Version diff (old → new) ===")
           changed = {k: (old.get(k, "(new)"), new[k]) for k in new if old.get(k) != new[k]}
-
           if not changed:
               print("  (no version changes detected)")
               sys.exit(0)
@@ -200,10 +275,10 @@ jobs:
               print(f"  {pkg:<{col}} {prev}  →  {curr}")
           EOF
 
-      # ── 8a. Force-trigger a single package (optional) ─────────────────────
+      # ── 11a. Force-trigger a single package (optional) ────────────────────
       # DRY_RUN is passed via env — trigger_obs.py reads os.environ["DRY_RUN"].
-      # Do NOT pass --dry-run as a CLI argument; the script does not accept it.
       - name: Force-trigger specific package
+        id: force
         if: ${{ github.event.inputs.force_package != '' }}
         env:
           OBS_TOKEN:     ${{ secrets.OBS_TOKEN }}
@@ -214,9 +289,9 @@ jobs:
           python scripts/trigger_obs.py \
             --force-package "$FORCE_PACKAGE"
 
-      # ── 8b. Trigger OBS for all updated packages ──────────────────────────
-      # DRY_RUN is passed via env — trigger_obs.py reads os.environ["DRY_RUN"].
+      # ── 11b. Trigger OBS for all updated packages ─────────────────────────
       - name: Trigger OBS service runs for updated packages
+        id: trigger
         if: ${{ github.event.inputs.force_package == '' }}
         env:
           OBS_TOKEN: ${{ secrets.OBS_TOKEN }}
@@ -224,11 +299,11 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/trigger_obs.py \
-            --old-versions "${{ env.VERSIONS_OLD }}" \
-            --new-versions "${{ env.VERSIONS_NEW }}" \
+            --old-versions "$VERSIONS_OLD" \
+            --new-versions "$VERSIONS_NEW" \
             --output-summary trigger_summary.json
 
-      # ── 9. Print summary to log AND the Actions summary page ──────────────
+      # ── 12. Print summary to log AND the Actions summary page ─────────────
       - name: Print trigger summary
         if: always()
         run: |
@@ -244,7 +319,6 @@ jobs:
           with open("trigger_summary.json") as f:
               s = json.load(f)
 
-          # ── Plain-text log output ──────────────────────────────────────
           print("=== Trigger Summary ===")
           print(f"  Packages checked  : {s.get('checked', 0)}")
           print(f"  Updates found     : {s.get('updated', 0)}")
@@ -261,7 +335,6 @@ jobs:
               for p in s["failed_list"]:
                   print(f"  {p['package']}: {p['error']}")
 
-          # ── Markdown table for the GitHub Actions summary page ─────────
           md = ["## OBS Trigger Summary\n"]
           md += [
               "| Metric | Value |",
@@ -296,24 +369,28 @@ jobs:
                   f.write("\n".join(md) + "\n")
           EOF
 
-      # ── 10. Commit updated versions.json ──────────────────────────────────
+      # ── 13. Commit updated versions.json ──────────────────────────────────
+      # Runs after failures too (!cancelled instead of always, so a manual
+      # cancel doesn't commit), which is what lets successfully-triggered
+      # packages advance even when another package failed.
+      #
+      # Safety rules:
+      #   - Skipped for dry runs and for force-trigger runs (a force run
+      #     triggers one package; it must not mark every other pending update
+      #     as "known" without having triggered it).
+      #   - If the trigger step never completed AND left no summary (crash,
+      #     bad OBS token, or nvchecker analysis aborted the run), NOTHING is
+      #     advanced, so every update is retried next run instead of lost.
+      #   - Packages in failed_list keep their old version → retried next run.
       - name: Commit updated versions.json
-        # always() ensures this step runs even when a prior step exits non-zero
-        # (e.g. trigger_obs.py returning 1 because one package failed to trigger).
-        # Without always(), GitHub Actions skips this step on any prior failure,
-        # which is exactly what kept versions.json stuck at {} forever.
-        # The dry-run guard is still enforced via the second condition.
-        if: ${{ always() && (github.event.inputs.dry_run || 'false') != 'true' }}
+        if: ${{ !cancelled() && (github.event.inputs.dry_run || 'false') != 'true' && github.event.inputs.force_package == '' }}
+        env:
+          TRIGGER_OUTCOME: ${{ steps.trigger.outcome }}
         run: |
           set -euo pipefail
 
-          # Smart merge:
-          #   - Packages that triggered successfully  → advance their version
-          #   - Packages in failed_list              → keep old version (retry next run)
-          #   - versions_new.json may be a nvchecker v2 envelope {"version":2,"data":{...}}
-          #     so we unwrap it the same way trigger_obs.py does.
           python - <<'EOF'
-          import json
+          import json, os, sys
 
           def load_flat(path):
               """Load a versions file and return a flat {pkg: version_str} dict."""
@@ -322,7 +399,6 @@ jobs:
                       raw = json.load(f)
               except (FileNotFoundError, json.JSONDecodeError):
                   return {}
-              # Unwrap nvchecker v2 envelope
               if isinstance(raw.get("version"), int) and isinstance(raw.get("data"), dict):
                   raw = raw["data"]
               return {
@@ -337,11 +413,16 @@ jobs:
               except (FileNotFoundError, json.JSONDecodeError):
                   return {}
 
+          summary_exists = os.path.exists("trigger_summary.json")
+          if not summary_exists and os.environ.get("TRIGGER_OUTCOME") != "success":
+              print("⚠️  OBS trigger step did not complete and wrote no summary — "
+                    "NOT advancing versions.json (all updates will be retried next run).")
+              sys.exit(0)
+
           old     = load_flat("versions.json")
           new     = load_flat("versions_new.json")
           summary = load_json("trigger_summary.json")
 
-          # Packages whose OBS trigger failed — hold back so they retry next run
           failed_pkgs = {p["package"] for p in summary.get("failed_list", [])}
           if failed_pkgs:
               print(f"⚠️  {len(failed_pkgs)} package(s) failed triggering — "
@@ -350,7 +431,6 @@ jobs:
           merged = dict(old)
           added = changed = skipped = 0
           for pkg, ver in new.items():
-              # Also skip null/empty versions that slipped through
               if not ver or ver.strip().lower() == "null":
                   skipped += 1
                   continue
@@ -377,15 +457,35 @@ jobs:
 
           if git diff --staged --quiet; then
             echo "versions.json is unchanged — skipping commit."
-          else
-            # Rebase onto any commits that landed while this job was running
-            git pull --rebase --autostash origin HEAD
-            git commit -m "chore: update known package versions [skip ci]"
-            git push
-            echo "✅ Pushed updated versions.json"
+            exit 0
           fi
 
-      # ── 11. Upload debug artifacts ────────────────────────────────────────
+          # Commit FIRST, then rebase. (Rebasing with staged changes +
+          # --autostash un-stages them, and the following `git commit` then
+          # fails with "nothing to commit".)
+          git commit -m "chore: update known package versions [skip ci]"
+
+          for attempt in 1 2 3; do
+            if git pull --rebase origin "${GITHUB_REF_NAME}" \
+               && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "✅ Pushed updated versions.json"
+              exit 0
+            fi
+            echo "⚠️  Push attempt ${attempt} failed — retrying …"
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+
+          echo "::error::Could not push versions.json after 3 attempts."
+          exit 1
+
+      # ── 14. Remove the token-bearing keyfile ──────────────────────────────
+      - name: Remove nvchecker keyfile
+        if: always()
+        run: rm -f "$KEYFILE"
+
+      # ── 15. Upload debug artifacts ────────────────────────────────────────
+      # The keyfile is deliberately NOT in this list.
       - name: Upload run artifacts
         if: always()
         uses: actions/upload-artifact@v7
@@ -394,6 +494,7 @@ jobs:
           path: |
             nvchecker_output.jsonl
             nvchecker_errors.log
+            versions_new.json
             trigger_summary.json
-          if-no-files-found: ignore   # don't fail if a file was never created
+          if-no-files-found: ignore
           retention-days: 14
