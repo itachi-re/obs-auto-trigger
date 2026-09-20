@@ -11,3 +11,4 @@ trigger_summary.json
 __pycache__/
 *.py[cod]
 .venv/
+.nvchecker_keyfile.toml
