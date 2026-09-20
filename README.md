@@ -1,6 +1,25 @@
 # OBS Auto-Trigger
 
 [![Check upstream versions](https://github.com/itachi-re/obs-auto-trigger/actions/workflows/check-updates.yml/badge.svg)](https://github.com/itachi-re/obs-auto-trigger/actions/workflows/check-updates.yml)
+<!-- Status -->
+[![Check upstream versions](https://img.shields.io/github/actions/workflow/status/itachi-re/obs-auto-trigger/check-updates.yml?branch=main&logo=githubactions&logoColor=white&label=check%20upstream%20versions)](https://github.com/itachi-re/obs-auto-trigger/actions/workflows/check-updates.yml)
+[![Last commit](https://img.shields.io/github/last-commit/itachi-re/obs-auto-trigger?logo=git&logoColor=white)](https://github.com/itachi-re/obs-auto-trigger/commits/main)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/itachi-re/obs-auto-trigger?logo=github)](https://github.com/itachi-re/obs-auto-trigger/graphs/commit-activity)
+[![Open issues](https://img.shields.io/github/issues/itachi-re/obs-auto-trigger?logo=github)](https://github.com/itachi-re/obs-auto-trigger/issues)
+
+<!-- Project -->
+[![OBS project](https://img.shields.io/badge/OBS-home%3Aitachi__re-73BA25?logo=opensuse&logoColor=white)](https://build.opensuse.org/project/show/home:itachi_re)
+[![Packages tracked](https://img.shields.io/badge/packages-100%2B-brightgreen?logo=linux&logoColor=white)](nvchecker.toml)
+[![Checks every 6 hours](https://img.shields.io/badge/checks-every%206h-informational?logo=githubactions&logoColor=white)](.github/workflows/check-updates.yml)
+
+<!-- Tech -->
+[![nvchecker](https://img.shields.io/badge/powered%20by-nvchecker-blue)](https://nvchecker.readthedocs.io/)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/features/actions)
+
+<!-- Community -->
+[![Stars](https://img.shields.io/github/stars/itachi-re/obs-auto-trigger?logo=github)](https://github.com/itachi-re/obs-auto-trigger/stargazers)
+[![License](https://img.shields.io/github/license/itachi-re/obs-auto-trigger)](LICENSE)
 
 Automated upstream version tracking for **100+ packages** in the openSUSE Build Service (OBS)
 project `home:itachi_re`. A GitHub Actions cron job checks every upstream with
