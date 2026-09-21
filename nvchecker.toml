@@ -560,15 +560,15 @@ use_max_tag = true
 # Qt / Multimedia
 # ══════════════════════════════════════════════════════════════════════════════
 
-[qt6-multimedia-ffmpeg]
-source = "github"
-github = "qt/qtmultimedia"
-use_max_tag = true
-
-#[qtscrcpy]
+#[qt6-multimedia-ffmpeg]
 #source = "github"
-#github = "barry-ran/QtScrcpy"
+#github = "qt/qtmultimedia"
 #use_max_tag = true
+
+[qtscrcpy]
+source = "github"
+github = "barry-ran/QtScrcpy"
+use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Torrents
