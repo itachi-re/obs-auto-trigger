@@ -225,6 +225,11 @@ source = "github"
 github = "sezanzeb/input-remapper"
 use_latest_release = true
 
+[OmniRoute]
+source = "git"
+git = "https://github.com/diegosouzapw/OmniRoute.git"
+use_max_release = true
+
 [zypperoni]
 source = "github"
 github = "pavinjosdev/zypperoni"
@@ -429,6 +434,11 @@ use_max_tag = true
 source = "git"
 git = "https://codeberg.org/valos/Komikku.git"
 use_max_tag = true
+
+[houdoku]
+source = "git"
+git = "https://github.com/xgi/houdoku.git"
+use_max_release = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # KDE / Plasma extras
