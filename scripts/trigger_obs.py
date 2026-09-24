@@ -60,7 +60,7 @@ import requests
 # Configuration
 # ---------------------------------------------------------------------------
 
-OBS_API_BASE     = "https://build.opensuse.org"
+OBS_API_BASE     = "https://api.opensuse.org"
 TRIGGER_ENDPOINT = f"{OBS_API_BASE}/trigger/runservice"
 REQUEST_TIMEOUT  = 30   # seconds per HTTP call
 RETRY_COUNT      = 3    # retries on transient network errors
