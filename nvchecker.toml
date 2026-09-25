@@ -279,6 +279,11 @@ source = "git"
 git = "https://gitlab.com/garuda-linux/firedragon/firedragon13.git"
 use_max_release = true
 
+[vivaldi]
+source = "cmd"
+cmd = "curl -fsSL https://repo.vivaldi.com/archive/deb/dists/stable/main/binary-amd64/Packages.gz | gzip -dc | awk '/^Package: vivaldi-stable$/{f=1;next} f && /^Version: /{print $2; f=0}' | cut -d- -f1 | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -n1"
+include_pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$"
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Network / VPN
 # ══════════════════════════════════════════════════════════════════════════════
