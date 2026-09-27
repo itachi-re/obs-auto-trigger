@@ -168,6 +168,11 @@ use_max_release = true
 source = "git"
 git = "https://github.com/sonorahq/sonora.git"
 use_max_release = true
+
+[lrcget]
+source = "git"
+git = "https://github.com/tranxuanthang/lrcget.git"
+use_max_release = true
 # ══════════════════════════════════════════════════════════════════════════════
 # Email
 # ══════════════════════════════════════════════════════════════════════════════
