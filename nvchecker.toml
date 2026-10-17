@@ -225,6 +225,11 @@ source = "github"
 github = "flameshot-org/flameshot"
 use_max_tag = true
 
+[lumine-capture]
+source = "git"
+git = "https://github.com/Netflate/LumineCapture.git"
+use_max_release = true
+
 [iotop]
 source = "github"
 github = "Tomas-M/iotop"
