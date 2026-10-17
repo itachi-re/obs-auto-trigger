@@ -386,9 +386,24 @@ source = "github"
 github = "Faugus/faugus-launcher"
 use_max_tag = true
 
+[gamescope]
+source = "git"
+git = "https://github.com/ValveSoftware/gamescope.git"
+use_max_tag = true
+
 [hydra-launcher]
 source = "git"
 git = "https://github.com/hydralauncher/hydra.git"
+use_max_release = true
+
+[lumafly]
+source = "git"
+git = "https://github.com/TheMulhima/Lumafly.git"
+use_max_release = true
+
+[ProtonPlus]
+source = "git"
+git = "https://github.com/Vysp3r/ProtonPlus.git"
 use_max_release = true
 
 [protonup-qt]
@@ -396,45 +411,36 @@ source = "github"
 github = "DavidoTek/ProtonUp-Qt"
 use_max_tag = true
 
-[ProtonPlus]
+[rbdoom3bfg]
+source = "github"
+github = "RobertBeckebans/RBDOOM-3-BFG"
+use_max_tag = true
+
+[scarab]
 source = "git"
-git = "https://github.com/Vysp3r/ProtonPlus.git"
+git = "https://github.com/fifty-six/Scarab.git"
 use_max_release = true
+
+[shadps4]
+source = "git"
+git = "https://github.com/shadps4-emu/shadPS4.git"
+include_regex = "^v\\.\\d+(\\.\\d+)*$"
+prefix = "v."
 
 [vermouth]
 source = "git"
 git = "https://github.com/dekomote/vermouth.git"
 use_commit = true
 
-[rbdoom3bfg]
+[winboat]
 source = "github"
-github = "RobertBeckebans/RBDOOM-3-BFG"
+github = "TibixDev/winboat"
 use_max_tag = true
 
 [windows95]
 source = "github"
 github = "felixrieseberg/windows95"
 use_max_tag = true
-
-[winboat]
-source = "github"
-github = "TibixDev/winboat"
-use_max_tag = true
-
-[gamescope]
-source = "git"
-git = "https://github.com/ValveSoftware/gamescope.git"
-use_max_tag = true
-
-[lumafly]
-source = "git"
-git = "https://github.com/TheMulhima/Lumafly.git"
-use_max_release = true
-
-[scarab]
-source = "git"
-git = "https://github.com/fifty-six/Scarab.git"
-use_max_release = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Manga / Comics
