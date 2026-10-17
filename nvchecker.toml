@@ -201,6 +201,11 @@ source = "github"
 github = "refactoringhq/tolaria"
 use_latest_release = true
 
+[stirling-pdf]
+source = "git"
+git = "https://github.com/Stirling-Tools/Stirling-PDF.git"
+use_max_release = true
+
 # ══════════════════════════════════════════════════════════════════════════════
 # System utilities
 # ══════════════════════════════════════════════════════════════════════════════
