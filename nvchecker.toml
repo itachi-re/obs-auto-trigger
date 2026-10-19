@@ -18,7 +18,7 @@ max_concurrency = 3
 [anbox-modules]
 source = "github"
 github = "llyyr/anbox-modules"
-use_max_tag = true
+use_commit = true
 
 [android-apktool]
 source = "github"
@@ -72,7 +72,7 @@ use_commit = true
 [waydroid-image]
 source = "github"
 github = "itachi-re/waydroid-image-obs"
-use_max_tag = true
+use_commit = true
 
 # waydroid-image-gapps / waydroid-image-vanilla: build outputs, not upstream
 # projects — tracking them makes no sense. REMOVED.
@@ -381,6 +381,7 @@ use_max_tag = true
 source = "github"
 github = "linuxmint/circle-flags"
 use_max_tag = true
+prefix = "v"
 
 [iso-country-flags]
 source = "github"
@@ -476,9 +477,10 @@ use_max_release = true
 # ══════════════════════════════════════════════════════════════════════════════
 
 [kde-material-you-colors]
-source = "git"
-github = "https://github.com/luisbocanegra/kde-material-you-colors.git"
-use_commit = true
+source = "github"
+github = "luisbocanegra/kde-material-you-colors"
+use_max_tag = true
+prefix = "v"
 
 [kurve]
 source = "github"
@@ -508,7 +510,7 @@ use_max_tag = true
 [plasma6-ksplash-bgrt]
 source = "github"
 github = "kbroulik/ksplash-bgrt"
-use_max_tag = true
+use_commit = true
 
 [plasma6-theme-apus]
 source = "git"
@@ -736,14 +738,10 @@ use_max_tag = true
 # Video calls
 # ══════════════════════════════════════════════════════════════════════════════
 
-[zoom]
-source = "cmd"
-cmd = '''
-curl -fsSL "https://zoom.us/download?os=linux" |
-grep -oP 'zoom_(amd64|openSUSE_x86_64)-\K[0-9.]+(?=\.(deb|rpm))' |
-head -n1
-'''
-include_pattern = "^[0-9.]+$"
+  [zoom]
+  source = "cmd"
+  cmd = "curl -fsSIL -o /dev/null -w '%{url_effective}' https://zoom.us/client/latest/zoom_openSUSE_x86_64.rpm | grep -oP 'prod/\\K[0-9.]+'"
+  include_pattern = "^[0-9.]+$"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Download managers
