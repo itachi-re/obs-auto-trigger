@@ -185,26 +185,36 @@ use_max_tag = true
 # ══════════════════════════════════════════════════════════════════════════════
 # Work
 # ══════════════════════════════════════════════════════════════════════════════
-[onlyoffice-desktopeditors]
-source = "github"
-github = "ONLYOFFICE/DesktopEditors"
-use_max_tag = true
-
 [joplin-desktop]
 source = "github"
 github = "laurent22/joplin"
 use_latest_release = true
 include_regex = "^v[\\d.]+$"
 
-[tolaria]
+[obsidian]
 source = "github"
-github = "refactoringhq/tolaria"
+github = "obsidianmd/obsidian-releases"
+use_max_tag = true
+
+[onlyoffice-desktopeditors]
+source = "github"
+github = "ONLYOFFICE/DesktopEditors"
+use_max_tag = true
+
+[opensidian]
+source = "git"
+git = "https://github.com/jpzk/opensidian.git"
 use_latest_release = true
 
 [stirling-pdf]
 source = "git"
 git = "https://github.com/Stirling-Tools/Stirling-PDF.git"
 use_max_release = true
+
+[tolaria]
+source = "github"
+github = "refactoringhq/tolaria"
+use_latest_release = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # System utilities
@@ -337,11 +347,6 @@ use_latest_release = true
 # Code::Blocks — tracked via Anitya (Sourceforge upstream)
 source = "anitya"
 anitya = "fedora/codeblocks"
-
-[obsidian]
-source = "github"
-github = "obsidianmd/obsidian-releases"
-use_max_tag = true
 
 [rkdeveloptool]
 source = "github"
