@@ -235,6 +235,11 @@ source = "github"
 github = "flameshot-org/flameshot"
 use_max_tag = true
 
+[filee]
+source = "git"
+git = "https://github.com/KnifeLemon/Filee.git"
+use_latest_release = true 
+
 [lumine-capture]
 source = "git"
 git = "https://github.com/Netflate/LumineCapture.git"
