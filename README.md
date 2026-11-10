@@ -16,7 +16,7 @@
 [![License](https://img.shields.io/github/license/itachi-re/obs-auto-trigger?style=flat-square&label=license)](LICENSE)
 
 [![nvchecker](https://img.shields.io/badge/powered%20by-nvchecker-blue?style=flat-square)](https://nvchecker.readthedocs.io/)
-[![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Python 3.14](https://img.shields.io/badge/python-3.14-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/features/actions)
 
 <sub>Automated upstream version tracking for the openSUSE Build Service project <a href="https://build.opensuse.org/project/show/home:itachi_re"><code>home:itachi_re</code></a>.</sub>
@@ -43,6 +43,8 @@ flowchart LR
 - ⏱️ Checks 100+ upstreams every 6 hours, with manual runs on demand
 - 🛡️ Fails safe: a bad run can never silently lose or duplicate an update
 - 🧪 Built-in dry-run and single-package force-trigger modes
+- 🔎 Preflight check: packages missing from OBS are skipped, never counted as failures
+- 🔨 Optional build polling to wait for OBS results (for local or custom runs)
 - 🔐 Least-privilege by design: no `pull_request` trigger, secrets never stored in the repo
 
 ---
@@ -56,14 +58,17 @@ flowchart LR
 
 1. [🔧 How it works](#how-it-works)
 2. [🛡️ Safety guarantees](#safety-guarantees)
-3. [🚀 One-time setup](#one-time-setup)
-4. [🗓️ Day-to-day usage](#day-to-day-usage)
-5. [⚙️ Configuring nvchecker](#configuring-nvchecker)
-6. [➕➖ Adding or removing a package](#adding-or-removing-a-package)
-7. [🌐 Supported upstream sources](#supported-upstream-sources)
-8. [🔒 Security notes](#security-notes)
-9. [🩺 Troubleshooting](#troubleshooting)
-10. [📁 File reference](#file-reference)
+3. [📋 Requirements](#requirements)
+4. [🚀 One-time setup](#one-time-setup)
+5. [🗓️ Day-to-day usage](#day-to-day-usage)
+6. [⌨️ `trigger_obs.py` reference](#trigger_obspy-reference)
+7. [⚙️ Configuring nvchecker](#configuring-nvchecker)
+8. [➕➖ Adding or removing a package](#adding-or-removing-a-package)
+9. [🌐 Supported upstream sources](#supported-upstream-sources)
+10. [🔒 Security notes](#security-notes)
+11. [🩺 Troubleshooting](#troubleshooting)
+12. [🧰 Maintenance](#maintenance)
+13. [📁 File reference](#file-reference)
 
 </details>
 
@@ -98,8 +103,11 @@ flowchart TD
     N --> A{"⚠️ More than 25%<br/>of entries errored?"}
     A -->|yes| F1["❌ Fail the run<br/>no OBS triggers<br/>versions.json untouched"]
     A -->|no| D["📊 Diff versions.json<br/>vs versions_new.json"]
-    D --> T["🚀 trigger_obs.py<br/>POST /trigger/runservice<br/>per changed package"]
+    D --> P{"🔎 Package exists<br/>in OBS?"}
+    P -->|no| SK["⏭️ Skip and record<br/>in skipped_list"]
+    P -->|yes| T["🚀 POST /trigger/runservice"]
     T --> C{"✅ Did the trigger<br/>step finish?"}
+    SK --> C
     C -->|crashed, no summary| F2["🛑 Do NOT advance<br/>versions.json"]
     C -->|yes| M["🔀 Merge:<br/>advance successes<br/>hold back failures"]
     M --> G["💾 Commit and push versions.json"]
@@ -115,13 +123,15 @@ flowchart TD
 For each package whose version changed, `trigger_obs.py` calls:
 
 ```http
-POST https://build.opensuse.org/trigger/runservice
+POST https://api.opensuse.org/trigger/runservice
      ?project=home:itachi_re
      &package=<PACKAGE_NAME>
 Authorization: Token <OBS_TOKEN>
 ```
 
 That runs the package's `_service` file. With `obs_scm`, OBS fetches the latest commit or tag from upstream, builds a new tarball, updates the version in the `.spec`, and queues a rebuild. ✨
+
+Before each trigger, the script also does a lightweight `GET /source/{project}/{package}` to confirm the package exists. A `404` means the package is skipped (a stale `nvchecker.toml` entry can never break the pipeline). Any other response is treated as "might exist" and the trigger call surfaces the real error.
 
 ---
 
@@ -133,12 +143,27 @@ The workflow is built so that a bad run **cannot silently lose or duplicate upda
 |---|---|
 | A few upstream checks fail (rate limit, dead URL) | Annotated in the run and skipped; everything else proceeds. Failed entries retry on the next run. |
 | More than `MAX_ERROR_RATIO` (default **25 %**) of entries fail, or nvchecker writes no output | The run fails **before** any OBS trigger and `versions.json` is left unchanged. |
+| nvchecker returns a `null` / empty version for a package | That package is skipped and never written to `versions.json`; it retries next run. |
+| A package does not exist in OBS (preflight returns 404) | Skipped and listed in `skipped_list`. It is not a failure. |
 | An OBS trigger fails for one package | That package keeps its old version in `versions.json`, so it is retried next run. The others advance. |
 | The trigger step crashes and writes no summary (bad token, script error) | `versions.json` is **not** advanced at all, so no update is lost. |
+| Transient network errors calling OBS | Triggers are retried up to 3 times with increasing backoff. |
 | Dry run | No OBS calls and no commit. |
 | Force-trigger run | Triggers only the named package and does **not** commit `versions.json`. |
 | Concurrent runs | Serialised by a concurrency group; a second run queues behind the first. |
 | Push races with another commit | Commit first, then `git pull --rebase --autostash`, with up to 3 push attempts. |
+
+---
+
+## Requirements
+
+| Requirement | Version / notes |
+|---|---|
+| 🐍 **Python** | **3.14** in CI (set by `PYTHON_VERSION` in the workflow). The scripts only need 3.11+ (`tomllib`, modern type hints). |
+| 🔍 **nvchecker** | Installed with `pip install 'nvchecker[all]'` |
+| 🌐 **requests** | Used by `trigger_obs.py` |
+| 🧰 **jq** | Preinstalled on `ubuntu-latest`; used by `cmd` sources |
+| 🔑 **OBS token** | `runservice` operation, covering the whole project |
 
 ---
 
@@ -260,8 +285,11 @@ git push
 Push, then open **Actions** and wait for the next scheduled run, or click **Run workflow**. A healthy run looks like this:
 
 ```text
-Project           : home:itachi_re
-Dry run           : False
+Project   : home:itachi_re
+Dry run   : False
+Preflight : enabled
+Polling   : disabled
+
 Packages tracked  : 102
 Updates detected  : 2
 
@@ -295,6 +323,80 @@ Everything is automatic. Check the **Actions** tab occasionally, or watch for th
 - **Run summary page** — an *nvchecker* table listing every entry that errored (with the real error message), then an *OBS Trigger Summary* with checked / updated / triggered / failed counts.
 - **Log annotations** — the first 10 nvchecker errors appear as warnings on the run.
 - **Artifacts** — `nvchecker-run-<N>` (kept 14 days) holds `nvchecker_output.jsonl`, `nvchecker_errors.log`, `versions_new.json` and `trigger_summary.json`. The token keyfile is **never** uploaded.
+
+---
+
+## `trigger_obs.py` reference
+
+The workflow calls the script for you, but you can also run it by hand (for example after a local nvchecker run).
+
+```bash
+export OBS_TOKEN=your_token
+export OBS_PROJECT=home:itachi_re      # optional, this is the default
+export DRY_RUN=true                    # optional, skips all HTTP calls
+
+python scripts/trigger_obs.py \
+  --old-versions versions.json \
+  --new-versions versions_new.json \
+  --output-summary trigger_summary.json
+```
+
+### 🏳️ Flags
+
+| Flag | Default | Purpose |
+|---|---|---|
+| `--old-versions` | `versions.json` | Stored versions file |
+| `--new-versions` | `versions_new.json` | Fresh nvchecker output |
+| `--output-summary` | `trigger_summary.json` | Where the JSON summary is written |
+| `--force-package NAME` | *(none)* | Trigger one package regardless of version changes |
+| `--skip-preflight` | off | Skip the OBS existence check (slightly faster, less safe) |
+| `--poll-builds` | off | After triggering, poll OBS until all builds settle |
+| `--poll-timeout SECONDS` | `300` | Maximum time to wait for builds |
+| `--poll-interval SECONDS` | `15` | Time between poll cycles |
+
+### 🌱 Environment variables
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `OBS_TOKEN` | ✅ | OBS API token with the `runservice` operation |
+| `OBS_PROJECT` | ❌ | OBS project name (default `home:itachi_re`) |
+| `DRY_RUN` | ❌ | `true` to skip all HTTP calls |
+
+### 🔨 Build polling (optional)
+
+> [!NOTE]
+> The scheduled workflow does **not** use `--poll-builds`, so runs stay short. Use it locally, or add the flag to the trigger step if you want the run to wait for build results.
+
+With `--poll-builds`, after all packages are triggered the script polls `GET /build/{project}/_result?package={pkg}` for every triggered package. Each repository/architecture is classified independently:
+
+| State | Meaning |
+|---|---|
+| `succeeded` | Build passed |
+| `failed` / `unresolvable` / `broken` | Build failed (the script exits non-zero) |
+| `disabled` / `excluded` | Skipped by OBS configuration, not counted |
+| `scheduled`, `building`, `finished`, `signing`, `dispatching`, `blocked` | Still in progress, keep polling |
+
+If the timeout expires first, the remaining packages are reported as `timed_out` (also non-zero exit).
+
+### 🧾 Summary file
+
+`trigger_summary.json` contains:
+
+```json
+{
+  "checked": 102,
+  "updated": 2,
+  "triggered": 2,
+  "skipped": 0,
+  "failed": 0,
+  "updated_list":  [{"package": "...", "old": "...", "new": "...", "status": "OK"}],
+  "skipped_list":  [{"package": "...", "reason": "not found in OBS"}],
+  "failed_list":   [{"package": "...", "error": "..."}],
+  "poll_results":  {}
+}
+```
+
+The commit step reads `failed_list` to decide which packages must keep their old version.
 
 ---
 
@@ -421,10 +523,12 @@ This repository is **public**, so keep the following in mind:
 | `version string not found` | A `regex` entry no longer matches the page | Update the regex |
 | HTTP 403 / rate limit exceeded | Token missing, expired, or budget used up | Check the *Check GitHub API auth and rate limit* step; refresh `NVCHECKER_PAT` |
 | Run fails with *"N% of entries errored"* | Over the `MAX_ERROR_RATIO` threshold, usually a token or network problem | Fix the errors listed on the summary page; nothing was triggered or committed |
+| `pip install 'nvchecker[all]'` fails after a Python bump | A dependency has no wheel for the new Python yet | Set `PYTHON_VERSION` back to the previous release (see [Maintenance](#maintenance)) |
 | `cannot pull with rebase: You have unstaged changes` | A tracked file was modified during the run, typically `.nvchecker_keyfile.toml` or `versions_new.json` committed to the repo | `git rm --cached <file>` and add it to `.gitignore` |
 | `Could not push versions.json after 3 attempts` | Same as above, or branch protection blocks the bot | Check the step log; allow `github-actions[bot]` to push to `main` |
 | Same packages re-trigger every run | `versions.json` is not advancing (the commit step is failing) or the version string format differs | Fix the commit step; compare `versions_new.json` with `versions.json` and add `prefix` if needed |
 | Same packages trigger once more after a failed push | Expected: the earlier run triggered OBS but could not save the new versions | Nothing to do. It settles after one successful run |
+| Package shows up in `skipped_list` | It does not exist in the OBS project (preflight returned 404) | Create the package in OBS or remove its `nvchecker.toml` entry |
 | OBS trigger returns **404** | The section name does not match the OBS package name | Compare with [home:itachi_re](https://build.opensuse.org/project/show/home:itachi_re) |
 | OBS trigger returns **401** | `OBS_TOKEN` is wrong or expired | Recreate the token (step 1) and update the secret |
 | Tag filter has no effect | `include_pattern` / `exclude_pattern` are not nvchecker options | Use `include_regex` / `exclude_regex` |
@@ -434,6 +538,33 @@ This repository is **public**, so keep the following in mind:
 ```bash
 nvchecker -c nvchecker.toml --logger json
 ```
+
+---
+
+## Maintenance
+
+### 🐍 Changing the Python version
+
+The version lives in one place, the `env:` block of `.github/workflows/check-updates.yml`:
+
+```yaml
+env:
+  PYTHON_VERSION: '3.14'
+```
+
+- Keep the **quotes**, otherwise YAML can misread values such as `3.10` as the number `3.1`.
+- `'3.x'` always resolves to the newest stable release, but it can pick up a release that nvchecker's dependencies do not support yet.
+- Before moving to a newer release, run the workflow once with **`dry_run = true`** and check that `pip install 'nvchecker[all]'` and the nvchecker step both succeed.
+- Remember to update the Python badge at the top of this README.
+
+### 🔄 Keeping actions up to date
+
+The workflow pins major versions of `actions/checkout`, `actions/setup-python` and `actions/upload-artifact`. Enable Dependabot for `github-actions` if you want automatic update PRs.
+
+### 🧹 Housekeeping
+
+- Remove packages from `nvchecker.toml` when you drop them from OBS, so they stop appearing in the summaries.
+- `versions.json` only ever holds the last triggered version per package, so it stays small and does not need pruning.
 
 ---
 
