@@ -757,17 +757,22 @@ source = "github"
 github = "amir1376/ab-download-manager"
 use_max_tag = true
 
-[yt-dlp]
-source = "git"
-git = "https://github.com/yt-dlp/yt-dlp"
-use_commit = true
+[jdownloader2]
+source = "regex"
+url = "https://jdownloader.org/jdownloader2"
+regex = 'JDownloader2Setup_([0-9.]+)\.exe'
 
 [media-downloader]
 source = "git"
 git = "https://github.com/mhogomchungu/media-downloader.git"
 use_commit = true
 
-[jdownloader2]
-source = "regex"
-url = "https://jdownloader.org/jdownloader2"
-regex = 'JDownloader2Setup_([0-9.]+)\.exe'
+[misterdownloadmanager-release]
+source = "github"
+github = "anefzaoui/misterdownloadmanager"
+use_latest_release = true
+
+[yt-dlp]
+source = "git"
+git = "https://github.com/yt-dlp/yt-dlp"
+use_commit = true
