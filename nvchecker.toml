@@ -767,7 +767,7 @@ source = "git"
 git = "https://github.com/mhogomchungu/media-downloader.git"
 use_commit = true
 
-[misterdownloadmanager-release]
+[misterdownloadmanager]
 source = "github"
 github = "anefzaoui/misterdownloadmanager"
 use_latest_release = true
