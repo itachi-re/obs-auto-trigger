@@ -42,7 +42,7 @@ env:
   # Must match `keyfile = ...` in nvchecker.toml [__config__]. Generated at
   # runtime from a secret and NEVER committed (add it to .gitignore).
   KEYFILE:         .nvchecker_keyfile.toml
-  PYTHON_VERSION:  '3.12'
+  PYTHON_VERSION:  '3.x'
   # Fail the run (and skip OBS triggers) if more than this fraction of the
   # entries in nvchecker.toml errored. Below it, the run continues with the
   # entries that did succeed and errored ones are retried next run.
