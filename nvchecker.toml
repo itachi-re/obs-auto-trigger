@@ -154,6 +154,11 @@ source = "git"
 git = "https://github.com/EdenwareApps/Megacubo.git"
 use_max_tag = true
 
+[mornye-desktop]
+source = "git"
+git = "https://github.com/mornyeapp/Mornye-Desktop.git"
+use_max_release = true
+
 ["nicotine+"]
 source = "git"
 git = "https://github.com/nicotine-plus/nicotine-plus.git"
@@ -756,6 +761,11 @@ use_max_tag = true
 source = "github"
 github = "amir1376/ab-download-manager"
 use_max_tag = true
+
+[hydra-download-manager]
+source = "git"
+git = "https://github.com/ja7ad/hydra.git"
+include_regex = 'v[0-9]+\.[0-9]+\.[0-9]+'
 
 [jdownloader2]
 source = "regex"
