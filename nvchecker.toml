@@ -765,7 +765,7 @@ use_max_tag = true
 [hydra-download-manager]
 source = "git"
 git = "https://github.com/ja7ad/hydra.git"
-include_regex = 'v[0-9]+\.[0-9]+\.[0-9]+'
+use_max_release = true
 
 [jdownloader2]
 source = "regex"
