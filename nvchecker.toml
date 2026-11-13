@@ -762,10 +762,15 @@ source = "github"
 github = "amir1376/ab-download-manager"
 use_max_tag = true
 
+[fluxdown]
+source = "git"
+git = "https://github.com/zerx-lab/FluxDown.git"
+use_latest_release = true
+
 [hydra-download-manager]
 source = "git"
 git = "https://github.com/ja7ad/hydra.git"
-use_max_release = true
+use_latest_release = true
 
 [jdownloader2]
 source = "regex"
@@ -778,8 +783,8 @@ git = "https://github.com/mhogomchungu/media-downloader.git"
 use_commit = true
 
 [misterdownloadmanager]
-source = "github"
-github = "anefzaoui/misterdownloadmanager"
+source = "git"
+git = "https://github.com/anefzaoui/misterdownloadmanager.git"
 use_latest_release = true
 
 [yt-dlp]
