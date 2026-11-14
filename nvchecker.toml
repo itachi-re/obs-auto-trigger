@@ -211,6 +211,11 @@ source = "git"
 git = "https://github.com/jpzk/opensidian.git"
 use_latest_release = true
 
+[pdfcraft]
+source = "github"
+github = "storytold/pdfcraft"
+use_latest_release = true
+
 [stirling-pdf]
 source = "git"
 git = "https://github.com/Stirling-Tools/Stirling-PDF.git"
@@ -747,11 +752,10 @@ use_max_tag = true
 # ══════════════════════════════════════════════════════════════════════════════
 # Video calls
 # ══════════════════════════════════════════════════════════════════════════════
-
-  [zoom]
-  source = "cmd"
-  cmd = "curl -fsSIL -o /dev/null -w '%{url_effective}' https://zoom.us/client/latest/zoom_openSUSE_x86_64.rpm | grep -oP 'prod/\\K[0-9.]+'"
-  include_pattern = "^[0-9.]+$"
+[zoom]
+source = "cmd"
+cmd = "curl -fsSIL -o /dev/null -w '%{url_effective}' https://zoom.us/client/latest/zoom_openSUSE_x86_64.rpm | grep -oP 'prod/\\K[0-9.]+'"
+include_pattern = "^[0-9.]+$"
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Download managers
