@@ -406,6 +406,10 @@ use_max_tag = true
 # ══════════════════════════════════════════════════════════════════════════════
 # Gaming / Wine / Emulation
 # ══════════════════════════════════════════════════════════════════════════════
+[Bottles]
+source = "git"
+git = "https://github.com/bottlesdevs/Bottles.git"
+use_max_tag = true
 
 [faugus-launcher]
 source = "github"
