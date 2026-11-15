@@ -409,7 +409,7 @@ use_max_tag = true
 [Bottles]
 source = "git"
 git = "https://github.com/bottlesdevs/Bottles.git"
-use_latest_release = true
+use_max_tag = true
 
 [faugus-launcher]
 source = "github"
