@@ -1,4 +1,5 @@
 {
+  "Bottles": "2022.12.14.1",
   "DirectXShaderCompiler": "v1.10.2605.37",
   "OmniRoute": "v3.8.53",
   "ProtonPlus": "v0.6.8",
@@ -67,7 +68,7 @@
   "openrgb": "release_1.0",
   "opensidian": "v0.9.4",
   "pdfcraft": "v0.21.1",
-  "pear-desktop": "v3.12.0",
+  "pear-desktop": "v3.12.1",
   "pipes-rs": "v1.6.4",
   "plasma-panel-colorizer": "v8.1.0",
   "plasma-panel-spacer-extended": "v1.16.1",
@@ -103,7 +104,7 @@
   "vermouth": "dd75b97170de8c5f81ed3541c5ab316ee4afc3f9",
   "vivaldi": "8.3.4191.44",
   "waydroid": "20261016.111252",
-  "waydroid-image": "20261101.081530",
+  "waydroid-image": "20261115.082950",
   "waydroid-kmp-default": "1434f1ebf74135a99d17e83f25d8e23908efc4cf",
   "waydroid-magisk": "v1.2.4",
   "webcord": "v4.14.0",
