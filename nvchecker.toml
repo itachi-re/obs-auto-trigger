@@ -317,7 +317,7 @@ use_max_release = true
 [firedragon]
 source = "git"
 git = "https://gitlab.com/garuda-linux/firedragon/firedragon13.git"
-use_max_release = true
+use_latest_release = true
 
 [vivaldi]
 source = "cmd"
