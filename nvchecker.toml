@@ -363,6 +363,11 @@ use_latest_release = true
 source = "anitya"
 anitya = "fedora/codeblocks"
 
+[gittyup]
+source = "git"
+git = "https://github.com/Murmele/Gittyup.git"
+prefix = "v"
+
 [rkdeveloptool]
 source = "github"
 github = "rockchip-linux/rkdeveloptool"
