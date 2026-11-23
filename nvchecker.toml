@@ -785,12 +785,10 @@ source = "git"
 git = "https://github.com/zerx-lab/FluxDown.git"
 use_latest_release = true
 
-[ghost-downloader]
+[ghost-downlaoder]
 source = "git"
 git = "https://github.com/XiaoYouChR/Ghost-Downloader-3.git"
-use_commit = false
-include_regex = "^v[0-9]+\\.[0-9]+\\.[0-9]+$"
-prefix = "v"
+use_latest_release = true
 
 [hydra-download-manager]
 source = "git"
