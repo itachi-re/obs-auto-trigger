@@ -85,9 +85,8 @@ github = "Genymobile/scrcpy"
 use_latest_release = true
 
 [scrcpy-autoadb]
-source = "github"
-github = "nickcoutsos/scrcpy-autoadb"
-use_max_tag = true
+source = "git"
+git = "https://github.com/nickcoutsos/scrcpy-autoadb.git"
 
 [waydroid]
 source = "github"
@@ -321,9 +320,10 @@ git = "https://github.com/ja7ad/hydra.git"
 use_latest_release = true
 
 [jdownloader2]
-source = "regex"
-url = "https://jdownloader.org/jdownloader2"
-regex = 'JDownloader2Setup_([0-9.]+)\.exe'
+source = "httpheader"
+url = "https://installer.jdownloader.org/JDownloader2Setup_unix_nojre.sh"
+header = "Last-Modified"
+regex = '\w+, (\d+ \w+ \d{4})'
 
 [media-downloader]
 source = "git"
@@ -346,9 +346,8 @@ use_commit = true
 # ══════════════════════════════════════════════════════════════════════════════
 
 [circle-flags]
-source = "github"
-github = "linuxmint/circle-flags"
-use_max_tag = true
+source = "git"
+git = "https://github.com/linuxmint/circle-flags.git"
 prefix = "v"
 
 [ComixCursors]
