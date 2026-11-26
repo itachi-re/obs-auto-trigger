@@ -316,11 +316,8 @@ git = "https://github.com/ja7ad/hydra.git"
 use_latest_release = true
 
 [jdownloader2]
-source = "httpheader"
-url = "https://installer.jdownloader.org/JDownloader2Setup_unix_nojre.sh"
-header = "Last-Modified"
-regex = '\w+, (\d+ \w+ \d{4})'
-follow_redirects = true
+source = "aur"
+aur = "jdownloader2"
 
 [media-downloader]
 source = "git"
