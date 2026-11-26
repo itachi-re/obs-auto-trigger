@@ -645,11 +645,11 @@ include_pattern = "^[0-9.]+$"
 # Multimedia libraries
 # ══════════════════════════════════════════════════════════════════════════════
 
-[ffmpeg-9]
-source = "git"
-git = "https://git.ffmpeg.org/ffmpeg.git"
-include_regex = 'n9(\.\d+)+'
-prefix = "n"
+#[ffmpeg-9]
+#source = "git"
+#git = "https://git.ffmpeg.org/ffmpeg.git"
+#include_regex = 'n9(\.\d+)+'
+#prefix = "n"
 
 #[qt6-multimedia-ffmpeg]
 #source = "github"
@@ -846,10 +846,10 @@ source = "github"
 github = "Tomas-M/iotop"
 use_max_tag = true
 
-[mission-center]
-source = "git"
-git = "https://gitlab.com/mission-center-devs/mission-center.git"
-use_commit = true
+#[mission-center]
+#source = "git"
+#git = "https://gitlab.com/mission-center-devs/mission-center.git"
+#use_commit = true
 
 [TuxManager]
 source = "github"
