@@ -84,10 +84,6 @@ source = "github"
 github = "Genymobile/scrcpy"
 use_latest_release = true
 
-[scrcpy-autoadb]
-source = "git"
-git = "https://github.com/nickcoutsos/scrcpy-autoadb.git"
-
 [waydroid]
 source = "github"
 github = "waydroid/waydroid"
@@ -324,6 +320,7 @@ source = "httpheader"
 url = "https://installer.jdownloader.org/JDownloader2Setup_unix_nojre.sh"
 header = "Last-Modified"
 regex = '\w+, (\d+ \w+ \d{4})'
+follow_redirects = true
 
 [media-downloader]
 source = "git"
@@ -348,7 +345,7 @@ use_commit = true
 [circle-flags]
 source = "git"
 git = "https://github.com/linuxmint/circle-flags.git"
-prefix = "v"
+use_commit = true
 
 [ComixCursors]
 source = "git"
