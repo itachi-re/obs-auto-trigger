@@ -124,6 +124,12 @@ source = "github"
 github = "mkckr0/audio-share"
 use_max_tag = true
 
+[ffmpeg-9]
+source = "git"
+git = "https://git.ffmpeg.org/ffmpeg.git"
+include_regex = 'n9(\.\d+)+'
+prefix = "n"
+
 [ani-cli]
 source = "git"
 git = "https://github.com/pystardust/ani-cli.git"
@@ -235,6 +241,17 @@ source = "github"
 github = "bleachbit/bleachbit"
 use_max_tag = true
 
+[atuin]
+source = "git"
+git = "https://github.com/atuinsh/atuin.git"
+include_regex = 'v\d+\.\d+\.\d+'
+prefix = "v"
+
+[conky]
+source = "git"
+git = "https://github.com/brndnmtthws/conky.git"
+use_commit = true
+
 [fastfetch]
 source = "github"
 github = "fastfetch-cli/fastfetch"
@@ -254,6 +271,27 @@ use_latest_release = true
 source = "git"
 git = "https://github.com/Netflate/LumineCapture.git"
 use_latest_release = true
+
+[keepassxc]
+source = "git"
+git = "https://github.com/keepassxreboot/keepassxc.git"
+use_commit = true
+
+[lttng-ust]
+source = "git"
+git = "https://github.com/lttng/lttng-ust.git"
+branch = "stable-2.12"
+use_commit = true
+
+[mission-center]
+source = "git"
+git = "https://gitlab.com/mission-center-devs/mission-center.git"
+use_commit = true
+
+[modprobed-db]
+source = "git"
+git = "https://github.com/graysky2/modprobed-db.git"
+use_commit = true
 
 [iotop]
 source = "github"
@@ -507,6 +545,40 @@ git = "https://github.com/xgi/houdoku.git"
 use_max_release = true
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Graphics
+# ══════════════════════════════════════════════════════════════════════════════
+
+[gimp]
+source = "git"
+git = "https://gitlab.gnome.org/GNOME/gimp.git"
+use_commit = true
+
+[Mesa]
+source = "git"
+git = "https://gitlab.freedesktop.org/mesa/mesa.git"
+use_commit = true
+
+[shaderc]
+source = "git"
+git = "https://github.com/google/shaderc.git"
+use_commit = true
+
+[vulkan-headers]
+source = "git"
+git = "https://github.com/KhronosGroup/Vulkan-Headers.git"
+use_commit = true
+
+[vulkan-loader]
+source = "git"
+git = "https://github.com/KhronosGroup/Vulkan-Loader.git"
+use_commit = true
+
+[vulkan-tools]
+source = "git"
+git = "https://github.com/KhronosGroup/Vulkan-Tools.git"
+use_commit = true
+
+# ══════════════════════════════════════════════════════════════════════════════
 # KDE / Plasma extras
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -702,6 +774,12 @@ use_commit = true
 # ══════════════════════════════════════════════════════════════════════════════
 # Messaging / Social
 # ══════════════════════════════════════════════════════════════════════════════
+
+[vesktop]
+source = "git"
+git = "https://github.com/Vencord/Vesktop.git"
+include_regex = 'v\d+\.\d+\.\d+'
+prefix = "v"
 
 [telegram]
 source = "github"
