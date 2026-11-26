@@ -12,6 +12,16 @@ max_concurrency = 3
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# AI / LLM tools
+# ══════════════════════════════════════════════════════════════════════════════
+
+[OmniRoute]
+source = "git"
+git = "https://github.com/diegosouzapw/OmniRoute.git"
+use_max_release = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Android / Waydroid ecosystem
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -64,6 +74,21 @@ source = "github"
 github = "waydroid/gbinder-python"
 use_max_tag = true
 
+[qtscrcpy]
+source = "github"
+github = "barry-ran/QtScrcpy"
+use_max_tag = true
+
+[scrcpy]
+source = "github"
+github = "Genymobile/scrcpy"
+use_latest_release = true
+
+[scrcpy-autoadb]
+source = "github"
+github = "nickcoutsos/scrcpy-autoadb"
+use_max_tag = true
+
 [waydroid]
 source = "github"
 github = "waydroid/waydroid"
@@ -88,6 +113,32 @@ source = "github"
 github = "nitanmarcel/waydroid-magisk"
 use_max_tag = true
 
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Anime / Manga / Comics
+# ══════════════════════════════════════════════════════════════════════════════
+
+[ani-cli]
+source = "git"
+git = "https://github.com/pystardust/ani-cli.git"
+use_max_release = true
+
+[houdoku]
+source = "git"
+git = "https://github.com/xgi/houdoku.git"
+use_max_release = true
+
+[komikku]
+source = "git"
+git = "https://codeberg.org/valos/Komikku.git"
+use_max_tag = true
+
+[mangayomi]
+source = "github"
+github = "kodjodevf/mangayomi"
+use_max_tag = true
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # Arduino / Embedded
 # ══════════════════════════════════════════════════════════════════════════════
@@ -97,26 +148,19 @@ source = "github"
 github = "arduino/arduino-ide"
 use_max_tag = true
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Arch Linux tools
-# ══════════════════════════════════════════════════════════════════════════════
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Fun / Terminal toys
-# ══════════════════════════════════════════════════════════════════════════════
-
-[asciiquarium]
+[rkdeveloptool]
 source = "github"
-github = "itachi-re/asciiquarium"
-use_max_tag = true
+github = "rockchip-linux/rkdeveloptool"
+use_commit = true
 
-[pipes-rs]
+[rkflashtool]
 source = "github"
-github = "lhvy/pipes-rs"
-use_max_tag = true
+github = "linux-rockchip/rkflashtool"
+use_commit = true
+
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Audio / Media
+# Audio / Music
 # ══════════════════════════════════════════════════════════════════════════════
 
 [audio-share]
@@ -124,51 +168,20 @@ source = "github"
 github = "mkckr0/audio-share"
 use_max_tag = true
 
-[ffmpeg-9]
-source = "git"
-git = "https://git.ffmpeg.org/ffmpeg.git"
-include_regex = 'n9(\.\d+)+'
-prefix = "n"
-
-[ani-cli]
-source = "git"
-git = "https://github.com/pystardust/ani-cli.git"
-use_max_release = true
-
-[hypnotix]
-source = "github"
-github = "linuxmint/hypnotix"
-use_max_tag = true
-
-[fred-tv]
-source = "git"
-git = "https://github.com/Fredolx/open-tv.git"
-use_max_tag = true
-
-[iptvnator]
-source = "git"
-git = "https://github.com/4gray/iptvnator.git"
-use_max_tag = true
-
 [limusic]
 source = "git"
 git = "https://github.com/SimoHypers/limusic.git"
 use_max_release = true
 
-[megacubo]
+[lrcget]
 source = "git"
-git = "https://github.com/EdenwareApps/Megacubo.git"
-use_max_tag = true
+git = "https://github.com/tranxuanthang/lrcget.git"
+use_max_release = true
 
 [mornye-desktop]
 source = "git"
 git = "https://github.com/mornyeapp/Mornye-Desktop.git"
 use_max_release = true
-
-["nicotine+"]
-source = "git"
-git = "https://github.com/nicotine-plus/nicotine-plus.git"
-use_max_tag = true
 
 [pear-desktop]
 source = "git"
@@ -180,143 +193,21 @@ source = "git"
 git = "https://github.com/sonorahq/sonora.git"
 use_max_release = true
 
-[lrcget]
-source = "git"
-git = "https://github.com/tranxuanthang/lrcget.git"
-use_max_release = true
-# ══════════════════════════════════════════════════════════════════════════════
-# Email
-# ══════════════════════════════════════════════════════════════════════════════
-
-[betterbird]
-source = "github"
-github = "Betterbird/thunderbird-patches"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Work
-# ══════════════════════════════════════════════════════════════════════════════
-[joplin-desktop]
-source = "github"
-github = "laurent22/joplin"
-use_latest_release = true
-include_regex = "^v[\\d.]+$"
-
-[obsidian]
-source = "github"
-github = "obsidianmd/obsidian-releases"
-use_max_tag = true
-
-[onlyoffice-desktopeditors]
-source = "github"
-github = "ONLYOFFICE/DesktopEditors"
-use_max_tag = true
-
-[opensidian]
-source = "git"
-git = "https://github.com/jpzk/opensidian.git"
-use_latest_release = true
-
-[pdfcraft]
-source = "github"
-github = "storytold/pdfcraft"
-use_latest_release = true
-
-[stirling-pdf]
-source = "git"
-git = "https://github.com/Stirling-Tools/Stirling-PDF.git"
-use_max_release = true
-
-[tolaria]
-source = "github"
-github = "refactoringhq/tolaria"
-use_latest_release = true
-
-# ══════════════════════════════════════════════════════════════════════════════
-# System utilities
+# Boot / EFI / ISO tools
 # ══════════════════════════════════════════════════════════════════════════════
 
-[bleachbit]
-source = "github"
-github = "bleachbit/bleachbit"
+[rEFInd]
+source = "git"
+git = "https://gitlab.com/btklein/refind.git"
 use_max_tag = true
 
-[atuin]
-source = "git"
-git = "https://github.com/atuinsh/atuin.git"
-include_regex = 'v\d+\.\d+\.\d+'
-prefix = "v"
-
-[conky]
-source = "git"
-git = "https://github.com/brndnmtthws/conky.git"
-use_commit = true
-
-[fastfetch]
+[ventoy]
 source = "github"
-github = "fastfetch-cli/fastfetch"
+github = "ventoy/Ventoy"
 use_max_tag = true
 
-[flameshot]
-source = "github"
-github = "flameshot-org/flameshot"
-use_max_tag = true
-
-[filee]
-source = "git"
-git = "https://github.com/KnifeLemon/Filee.git"
-use_latest_release = true 
-
-[lumine-capture]
-source = "git"
-git = "https://github.com/Netflate/LumineCapture.git"
-use_latest_release = true
-
-[keepassxc]
-source = "git"
-git = "https://github.com/keepassxreboot/keepassxc.git"
-use_commit = true
-
-[lttng-ust]
-source = "git"
-git = "https://github.com/lttng/lttng-ust.git"
-branch = "stable-2.12"
-use_commit = true
-
-[mission-center]
-source = "git"
-git = "https://gitlab.com/mission-center-devs/mission-center.git"
-use_commit = true
-
-[modprobed-db]
-source = "git"
-git = "https://github.com/graysky2/modprobed-db.git"
-use_commit = true
-
-[iotop]
-source = "github"
-github = "Tomas-M/iotop"
-use_max_tag = true
-
-[input-remapper]
-source = "github"
-github = "sezanzeb/input-remapper"
-use_latest_release = true
-
-[OmniRoute]
-source = "git"
-git = "https://github.com/diegosouzapw/OmniRoute.git"
-use_max_release = true
-
-[zypperoni]
-source = "github"
-github = "pavinjosdev/zypperoni"
-use_max_tag = true
-
-[zypperx]
-source = "github"
-github = "itachi-re/zypperx"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Browsers
@@ -367,33 +258,25 @@ source = "git"
 git = "https://github.com/zen-browser/desktop.git"
 use_max_release = true
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Network / VPN
-# ══════════════════════════════════════════════════════════════════════════════
-
-[cloudflare-warp]
-source = "regex"
-url = "https://developers.cloudflare.com/changelog/rss/index.xml"
-regex = 'Cloudflare One Client for Linux \(version ([\d.]+)\)'
-
-[wgcf]
-source = "github"
-github = "ViRb3/wgcf"
-use_max_tag = true
-
-[wg-info]
-source = "git"
-git = "https://codeberg.org/itachi-re/wg-info.git"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Development tools
 # ══════════════════════════════════════════════════════════════════════════════
 
+[codeblocks]
+# Code::Blocks — tracked via Anitya (Sourceforge upstream)
+source = "anitya"
+anitya = "fedora/codeblocks"
+
 [codium]
 source = "github"
 github = "VSCodium/vscodium"
 use_max_tag = true
+
+[gittyup]
+source = "git"
+git = "https://github.com/Murmele/Gittyup.git"
+prefix = "v"
 
 [gradle]
 # The _service was pointing at the GitHub releases API — use GitHub directly
@@ -401,24 +284,10 @@ source = "github"
 github = "gradle/gradle"
 use_latest_release = true
 
-[codeblocks]
-# Code::Blocks — tracked via Anitya (Sourceforge upstream)
-source = "anitya"
-anitya = "fedora/codeblocks"
-
-[gittyup]
+[lttng-ust]
 source = "git"
-git = "https://github.com/Murmele/Gittyup.git"
-prefix = "v"
-
-[rkdeveloptool]
-source = "github"
-github = "rockchip-linux/rkdeveloptool"
-use_commit = true
-
-[rkflashtool]
-source = "github"
-github = "linux-rockchip/rkflashtool"
+git = "https://github.com/lttng/lttng-ust.git"
+branch = "stable-2.12"
 use_commit = true
 
 [zed]
@@ -426,14 +295,72 @@ source = "git"
 git = "https://github.com/zed-industries/zed.git"
 use_max_tag = true
 
+
 # ══════════════════════════════════════════════════════════════════════════════
-# Fonts / Themes
+# Download managers
 # ══════════════════════════════════════════════════════════════════════════════
+
+[abdm]
+source = "github"
+github = "amir1376/ab-download-manager"
+use_max_tag = true
+
+[fluxdown]
+source = "git"
+git = "https://github.com/zerx-lab/FluxDown.git"
+use_latest_release = true
+
+[ghost-downlaoder]
+source = "git"
+git = "https://github.com/XiaoYouChR/Ghost-Downloader-3.git"
+use_latest_release = true
+
+[hydra-download-manager]
+source = "git"
+git = "https://github.com/ja7ad/hydra.git"
+use_latest_release = true
+
+[jdownloader2]
+source = "regex"
+url = "https://jdownloader.org/jdownloader2"
+regex = 'JDownloader2Setup_([0-9.]+)\.exe'
+
+[media-downloader]
+source = "git"
+git = "https://github.com/mhogomchungu/media-downloader.git"
+use_commit = true
+
+[misterdownloadmanager]
+source = "git"
+git = "https://github.com/anefzaoui/misterdownloadmanager.git"
+use_latest_release = true
+
+[yt-dlp]
+source = "git"
+git = "https://github.com/yt-dlp/yt-dlp"
+use_commit = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Fonts / Icons / Cursors
+# ══════════════════════════════════════════════════════════════════════════════
+
+[circle-flags]
+source = "github"
+github = "linuxmint/circle-flags"
+use_max_tag = true
+prefix = "v"
+
 [ComixCursors]
 source = "git"
 git = "https://gitlab.com/limitland/comixcursors.git"
 branch = "master"
 use_commit = true
+
+[iso-country-flags]
+source = "github"
+github = "linuxmint/flags"
+use_max_tag = true
 
 [monaspace-fonts]
 source = "github"
@@ -445,29 +372,25 @@ source = "github"
 github = "ryanoasis/nerd-fonts"
 use_max_tag = true
 
-[circle-flags]
-source = "github"
-github = "linuxmint/circle-flags"
-use_max_tag = true
-prefix = "v"
-
-[iso-country-flags]
-source = "github"
-github = "linuxmint/flags"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Gaming / Wine / Emulation
+# Fun / Terminal toys
 # ══════════════════════════════════════════════════════════════════════════════
-[Bottles]
-source = "git"
-git = "https://github.com/bottlesdevs/Bottles.git"
+
+[asciiquarium]
+source = "github"
+github = "itachi-re/asciiquarium"
 use_max_tag = true
 
-[faugus-launcher]
+[pipes-rs]
 source = "github"
-github = "Faugus/faugus-launcher"
+github = "lhvy/pipes-rs"
 use_max_tag = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Gaming
+# ══════════════════════════════════════════════════════════════════════════════
 
 [gamescope]
 source = "git"
@@ -484,16 +407,6 @@ source = "git"
 git = "https://github.com/TheMulhima/Lumafly.git"
 use_max_release = true
 
-[ProtonPlus]
-source = "git"
-git = "https://github.com/Vysp3r/ProtonPlus.git"
-use_max_release = true
-
-[protonup-qt]
-source = "github"
-github = "DavidoTek/ProtonUp-Qt"
-use_max_tag = true
-
 [rbdoom3bfg]
 source = "github"
 github = "RobertBeckebans/RBDOOM-3-BFG"
@@ -504,54 +417,42 @@ source = "git"
 git = "https://github.com/fifty-six/Scarab.git"
 use_max_release = true
 
-[shadps4]
-source = "git"
-git = "https://github.com/shadps4-emu/shadPS4.git"
-include_regex = "^v\\.\\d+(\\.\\d+)*$"
-prefix = "v."
-
 [vermouth]
 source = "git"
 git = "https://github.com/dekomote/vermouth.git"
 use_commit = true
 
-[winboat]
-source = "github"
-github = "TibixDev/winboat"
-use_max_tag = true
-
-[windows95]
-source = "github"
-github = "felixrieseberg/windows95"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Manga / Comics
-# ══════════════════════════════════════════════════════════════════════════════
-
-[mangayomi]
-source = "github"
-github = "kodjodevf/mangayomi"
-use_max_tag = true
-
-[komikku]
-source = "git"
-git = "https://codeberg.org/valos/Komikku.git"
-use_max_tag = true
-
-[houdoku]
-source = "git"
-git = "https://github.com/xgi/houdoku.git"
-use_max_release = true
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Graphics
+# Graphics apps (GIMP / Krita)
 # ══════════════════════════════════════════════════════════════════════════════
 
 [gimp]
 source = "git"
 git = "https://gitlab.gnome.org/GNOME/gimp.git"
 use_commit = true
+
+[krita]
+source = "gitlab"
+host = "invent.kde.org"
+gitlab = "graphics/krita"
+use_commit = true
+
+[kseexpr]
+source = "gitlab"
+host = "invent.kde.org"
+gitlab = "graphics/kseexpr"
+use_max_tag = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Graphics stack (Mesa / Vulkan / Shaders)
+# ══════════════════════════════════════════════════════════════════════════════
+
+[DirectXShaderCompiler]
+source = "github"
+github = "microsoft/DirectXShaderCompiler"
+use_max_tag = true
 
 [Mesa]
 source = "git"
@@ -577,6 +478,32 @@ use_commit = true
 source = "git"
 git = "https://github.com/KhronosGroup/Vulkan-Tools.git"
 use_commit = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# IPTV / Streaming
+# ══════════════════════════════════════════════════════════════════════════════
+
+[fred-tv]
+source = "git"
+git = "https://github.com/Fredolx/open-tv.git"
+use_max_tag = true
+
+[hypnotix]
+source = "github"
+github = "linuxmint/hypnotix"
+use_max_tag = true
+
+[iptvnator]
+source = "git"
+git = "https://github.com/4gray/iptvnator.git"
+use_max_tag = true
+
+[megacubo]
+source = "git"
+git = "https://github.com/EdenwareApps/Megacubo.git"
+use_max_tag = true
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # KDE / Plasma extras
@@ -633,25 +560,12 @@ source = "git"
 git = "https://gitlab.com/jomada/otto.git"
 use_commit = true
 
-# ══════════════════════════════════════════════════════════════════════════════
-# KDE Applications
-# ══════════════════════════════════════════════════════════════════════════════
-
-[krita]
-source = "gitlab"
-host = "invent.kde.org"
-gitlab = "graphics/krita"
-use_commit = true
-
-[kseexpr]
-source = "gitlab"
-host = "invent.kde.org"
-gitlab = "graphics/kseexpr"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Kernel
 # ══════════════════════════════════════════════════════════════════════════════
+
+# kernel-copyto: custom/local kernel module — no public upstream. Skip.
 
 [kernel-xanmod-v3]
 source = "git"
@@ -660,21 +574,16 @@ use_max_tag = true
 # Xanmod tags look like "6.9.3-xanmod1" — add include_pattern if needed:
 # include_pattern = "^[0-9]+\\.[0-9]+\\.[0-9]+-xanmod[0-9]+$"
 
+[modprobed-db]
+source = "git"
+git = "https://github.com/graysky2/modprobed-db.git"
+use_commit = true
+
 [xanmod-edge-custom]
 source = "git"
 git = "https://gitlab.com/xanmod/linux.git"
 use_max_tag = true
 
-# kernel-copyto: custom/local kernel module — no public upstream. Skip.
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Microsoft / DirectX
-# ══════════════════════════════════════════════════════════════════════════════
-
-[DirectXShaderCompiler]
-source = "github"
-github = "microsoft/DirectXShaderCompiler"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Lua / Perl / Python packages
@@ -683,6 +592,11 @@ use_max_tag = true
 [lua51-lpeg]
 source = "github"
 github = "roberto-ieru/LPeg"
+use_max_tag = true
+
+[python-markitdown]
+source = "github"
+github = "microsoft/markitdown"
 use_max_tag = true
 
 [python-pyclip]
@@ -700,42 +614,139 @@ source = "github"
 github = "eylles/pywal16"
 use_max_tag = true
 
-[python-markitdown]
-source = "github"
-github = "microsoft/markitdown"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Qt / Multimedia
+# Messaging / Video calls
 # ══════════════════════════════════════════════════════════════════════════════
+
+[telegram]
+source = "github"
+github = "telegramdesktop/tdesktop"
+use_max_tag = true
+
+[vesktop]
+source = "git"
+git = "https://github.com/Vencord/Vesktop.git"
+include_regex = 'v\d+\.\d+\.\d+'
+prefix = "v"
+
+[webcord]
+source = "github"
+github = "SpacingBat3/WebCord"
+use_max_tag = true
+
+[zoom]
+source = "cmd"
+cmd = "curl -fsSIL -o /dev/null -w '%{url_effective}' https://zoom.us/client/latest/zoom_openSUSE_x86_64.rpm | grep -oP 'prod/\\K[0-9.]+'"
+include_pattern = "^[0-9.]+$"
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Multimedia libraries
+# ══════════════════════════════════════════════════════════════════════════════
+
+[ffmpeg-9]
+source = "git"
+git = "https://git.ffmpeg.org/ffmpeg.git"
+include_regex = 'n9(\.\d+)+'
+prefix = "n"
 
 #[qt6-multimedia-ffmpeg]
 #source = "github"
 #github = "qt/qtmultimedia"
 #use_max_tag = true
 
-[qtscrcpy]
-source = "github"
-github = "barry-ran/QtScrcpy"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Network / VPN
+# ══════════════════════════════════════════════════════════════════════════════
+
+[cloudflare-warp]
+source = "regex"
+url = "https://developers.cloudflare.com/changelog/rss/index.xml"
+regex = 'Cloudflare One Client for Linux \(version ([\d.]+)\)'
+
+[wg-info]
+source = "git"
+git = "https://codeberg.org/itachi-re/wg-info.git"
 use_max_tag = true
 
+[wgcf]
+source = "github"
+github = "ViRb3/wgcf"
+use_max_tag = true
+
+
 # ══════════════════════════════════════════════════════════════════════════════
-# Torrents
+# Package management / AppImage
 # ══════════════════════════════════════════════════════════════════════════════
 
-[qBittorrent-Enhanced-Edition]
+[gearlever]
 source = "github"
-github = "c0re100/qBittorrent-Enhanced-Edition"
+github = "mijorus/gearlever"
+use_max_tag = true
+
+[zypperoni]
+source = "github"
+github = "pavinjosdev/zypperoni"
+use_max_tag = true
+
+[zypperx]
+source = "github"
+github = "itachi-re/zypperx"
+use_max_tag = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Productivity
+# ══════════════════════════════════════════════════════════════════════════════
+
+[betterbird]
+source = "github"
+github = "Betterbird/thunderbird-patches"
+use_max_tag = true
+
+[filee]
+source = "git"
+git = "https://github.com/KnifeLemon/Filee.git"
 use_latest_release = true
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Boot / EFI
-# ══════════════════════════════════════════════════════════════════════════════
+[joplin-desktop]
+source = "github"
+github = "laurent22/joplin"
+use_latest_release = true
+include_regex = "^v[\\d.]+$"
 
-[rEFInd]
-source = "git"
-git = "https://gitlab.com/btklein/refind.git"
+[obsidian]
+source = "github"
+github = "obsidianmd/obsidian-releases"
 use_max_tag = true
+
+[onlyoffice-desktopeditors]
+source = "github"
+github = "ONLYOFFICE/DesktopEditors"
+use_max_tag = true
+
+[opensidian]
+source = "git"
+git = "https://github.com/jpzk/opensidian.git"
+use_latest_release = true
+
+[pdfcraft]
+source = "github"
+github = "storytold/pdfcraft"
+use_latest_release = true
+
+[stirling-pdf]
+source = "git"
+git = "https://github.com/Stirling-Tools/Stirling-PDF.git"
+use_max_release = true
+
+[tolaria]
+source = "github"
+github = "refactoringhq/tolaria"
+use_latest_release = true
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Remote desktop / Screen sharing
@@ -744,21 +755,6 @@ use_max_tag = true
 [droidcam]
 source = "github"
 github = "dev47apps/droidcam-linux-client"
-use_max_tag = true
-
-[rustdesk]
-source = "github"
-github = "rustdesk/rustdesk"
-use_max_tag = true
-
-[scrcpy]
-source = "github"
-github = "Genymobile/scrcpy"
-use_latest_release = true
-
-[scrcpy-autoadb]
-source = "github"
-github = "nickcoutsos/scrcpy-autoadb"
 use_max_tag = true
 
 [freerdp]
@@ -771,57 +767,11 @@ source = "git"
 git = "https://gitlab.com/Remmina/Remmina.git"
 use_commit = true
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Messaging / Social
-# ══════════════════════════════════════════════════════════════════════════════
-
-[vesktop]
-source = "git"
-git = "https://github.com/Vencord/Vesktop.git"
-include_regex = 'v\d+\.\d+\.\d+'
-prefix = "v"
-
-[telegram]
+[rustdesk]
 source = "github"
-github = "telegramdesktop/tdesktop"
+github = "rustdesk/rustdesk"
 use_max_tag = true
 
-[webcord]
-source = "github"
-github = "SpacingBat3/WebCord"
-use_max_tag = true
-
-[win11-clipboard-history]
-source = "github"
-github = "gustavosett/Windows-11-Clipboard-History-For-Linux"
-use_max_tag = true
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Storage / ISO tools
-# ══════════════════════════════════════════════════════════════════════════════
-
-[ventoy]
-source = "github"
-github = "ventoy/Ventoy"
-use_max_tag = true
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Package management / Utilities
-# ══════════════════════════════════════════════════════════════════════════════
-
-[TuxManager]
-source = "github"
-github = "benapetr/TuxManager"
-use_commit = true
-
-# ══════════════════════════════════════════════════════════════════════════════
-# AppImage management
-# ══════════════════════════════════════════════════════════════════════════════
-
-[gearlever]
-source = "github"
-github = "mijorus/gearlever"
-use_max_tag = true
 
 # ══════════════════════════════════════════════════════════════════════════════
 # RGB / Hardware
@@ -832,9 +782,46 @@ use_max_tag = true
 #git = "https://gitlab.com/CalcProgrammer1/OpenRGB.git"
 #use_max_tag = true
 
+
 # ══════════════════════════════════════════════════════════════════════════════
-# Shell plugins
+# Screenshots / Screen capture
 # ══════════════════════════════════════════════════════════════════════════════
+
+[flameshot]
+source = "github"
+github = "flameshot-org/flameshot"
+use_max_tag = true
+
+[lumine-capture]
+source = "git"
+git = "https://github.com/Netflate/LumineCapture.git"
+use_latest_release = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Security / Privacy
+# ══════════════════════════════════════════════════════════════════════════════
+
+[bleachbit]
+source = "github"
+github = "bleachbit/bleachbit"
+use_max_tag = true
+
+[keepassxc]
+source = "git"
+git = "https://github.com/keepassxreboot/keepassxc.git"
+use_commit = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Shell / Terminal tools
+# ══════════════════════════════════════════════════════════════════════════════
+
+[atuin]
+source = "git"
+git = "https://github.com/atuinsh/atuin.git"
+include_regex = 'v\d+\.\d+\.\d+'
+prefix = "v"
 
 [zsh-autosuggestions]
 source = "github"
@@ -846,54 +833,103 @@ source = "github"
 github = "zsh-users/zsh-syntax-highlighting"
 use_max_tag = true
 
-# ══════════════════════════════════════════════════════════════════════════════
-# Video calls
-# ══════════════════════════════════════════════════════════════════════════════
-[zoom]
-source = "cmd"
-cmd = "curl -fsSIL -o /dev/null -w '%{url_effective}' https://zoom.us/client/latest/zoom_openSUSE_x86_64.rpm | grep -oP 'prod/\\K[0-9.]+'"
-include_pattern = "^[0-9.]+$"
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Download managers
+# System monitoring
 # ══════════════════════════════════════════════════════════════════════════════
 
-[abdm]
+[conky]
+source = "git"
+git = "https://github.com/brndnmtthws/conky.git"
+use_commit = true
+
+[fastfetch]
 source = "github"
-github = "amir1376/ab-download-manager"
+github = "fastfetch-cli/fastfetch"
 use_max_tag = true
 
-[fluxdown]
-source = "git"
-git = "https://github.com/zerx-lab/FluxDown.git"
-use_latest_release = true
+[iotop]
+source = "github"
+github = "Tomas-M/iotop"
+use_max_tag = true
 
-[ghost-downlaoder]
+[mission-center]
 source = "git"
-git = "https://github.com/XiaoYouChR/Ghost-Downloader-3.git"
-use_latest_release = true
-
-[hydra-download-manager]
-source = "git"
-git = "https://github.com/ja7ad/hydra.git"
-use_latest_release = true
-
-[jdownloader2]
-source = "regex"
-url = "https://jdownloader.org/jdownloader2"
-regex = 'JDownloader2Setup_([0-9.]+)\.exe'
-
-[media-downloader]
-source = "git"
-git = "https://github.com/mhogomchungu/media-downloader.git"
+git = "https://gitlab.com/mission-center-devs/mission-center.git"
 use_commit = true
 
-[misterdownloadmanager]
-source = "git"
-git = "https://github.com/anefzaoui/misterdownloadmanager.git"
+[TuxManager]
+source = "github"
+github = "benapetr/TuxManager"
+use_commit = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# System utilities
+# ══════════════════════════════════════════════════════════════════════════════
+
+[input-remapper]
+source = "github"
+github = "sezanzeb/input-remapper"
 use_latest_release = true
 
-[yt-dlp]
+[win11-clipboard-history]
+source = "github"
+github = "gustavosett/Windows-11-Clipboard-History-For-Linux"
+use_max_tag = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Torrents / P2P
+# ══════════════════════════════════════════════════════════════════════════════
+
+["nicotine+"]
 source = "git"
-git = "https://github.com/yt-dlp/yt-dlp"
-use_commit = true
+git = "https://github.com/nicotine-plus/nicotine-plus.git"
+use_max_tag = true
+
+[qBittorrent-Enhanced-Edition]
+source = "github"
+github = "c0re100/qBittorrent-Enhanced-Edition"
+use_latest_release = true
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Wine / Proton / Emulation
+# ══════════════════════════════════════════════════════════════════════════════
+
+[Bottles]
+source = "git"
+git = "https://github.com/bottlesdevs/Bottles.git"
+use_max_tag = true
+
+[faugus-launcher]
+source = "github"
+github = "Faugus/faugus-launcher"
+use_max_tag = true
+
+[ProtonPlus]
+source = "git"
+git = "https://github.com/Vysp3r/ProtonPlus.git"
+use_max_release = true
+
+[protonup-qt]
+source = "github"
+github = "DavidoTek/ProtonUp-Qt"
+use_max_tag = true
+
+[shadps4]
+source = "git"
+git = "https://github.com/shadps4-emu/shadPS4.git"
+include_regex = "^v\\.\\d+(\\.\\d+)*$"
+prefix = "v."
+
+[winboat]
+source = "github"
+github = "TibixDev/winboat"
+use_max_tag = true
+
+[windows95]
+source = "github"
+github = "felixrieseberg/windows95"
+use_max_tag = true
