@@ -816,13 +816,6 @@ use_commit = true
 # ══════════════════════════════════════════════════════════════════════════════
 # Shell / Terminal tools
 # ══════════════════════════════════════════════════════════════════════════════
-
-[atuin]
-source = "git"
-git = "https://github.com/atuinsh/atuin.git"
-include_regex = 'v\d+\.\d+\.\d+'
-prefix = "v"
-
 [zsh-autosuggestions]
 source = "github"
 github = "zsh-users/zsh-autosuggestions"
